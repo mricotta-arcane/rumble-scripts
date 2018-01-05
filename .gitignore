@@ -1,0 +1,5 @@
+node_modules/
+public/**/*.txt
+public/**/*.csv
+*.zip
+zflogs/

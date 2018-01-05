@@ -1,0 +1,25 @@
+{
+  "name": "rumble-scripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://devsor@bitbucket.org/arcanestrategies/rumble-scripts.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/arcanestrategies/rumble-scripts#readme",
+  "devDependencies": {
+    "csv": "^1.1.1",
+    "gulp": "^3.9.1",
+    "gulp-jshint": "^2.0.4",
+    "gulp-notify": "^3.0.0",
+    "jshint": "^2.9.4",
+    "moment": "^2.18.1",
+    "moment-timezone": "^0.5.13"
+  }
+}
