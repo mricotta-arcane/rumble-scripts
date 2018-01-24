@@ -34,12 +34,12 @@ casper.on("page.error", function(msg, trace) {
   // this.echo("Page Error: " + msg, "ERROR");
 });
 
-var url = 'https://www.rumble-boxing.com/';
+var url = 'https://rumble.zingfitstudio.com/';
 var username = 'mricotta';
 var password = 'Rumbl3123!';
 
 var adminer = 'https://rumble.zingfitstudio.com/';
-var adminUrl = url+'admin/';
+var adminUrl = adminer;
 var reportURL = adminer+'index.cfm?action=Report.';
 var attendanceReportURL = reportURL+'attendanceExport&roomid=';		// This accepts 2 variables, the first is the roomid and the second is a period of time
 var salesReportURL = reportURL+'allSalesByDate';					// This accepts 1 variables, the date range

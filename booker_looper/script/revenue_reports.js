@@ -38,13 +38,13 @@ casper.on("page.error", function(msg, trace) {
 // var username = 'admin';
 // var password = 'password';
 // var reOpenClass = false;
-var url = 'https://www.rumble-boxing.com/';
+var url = 'https://rumble.zingfitstudio.com/';
 var username = 'mike.ricotta';
 var password = 'M1Rumbl3!KE';
 var reOpenClass = true;
 
 var adminer = 'https://rumble.zingfitstudio.com/';
-var adminUrl = url+'admin/';
+var adminUrl = adminer;
 var reportURL = adminer+'index.cfm?action=Report.';
 
 var file = 'zingfit_report_download.log';
