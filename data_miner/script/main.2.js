@@ -5,7 +5,7 @@ var moment = require('moment-timezone');
 var casper = require('casper').create({
   verbose: true,
   logLevel: 'debug',
-  waitTimeout: '18000',
+  waitTimeout: '15000',
   pageSettings: {
     allowMedia: false,
     javascriptEnabled: true,
@@ -57,7 +57,7 @@ if(typeof length === 'undefined' || length === null){
 
 var site = casper.cli.get('site');
 if(typeof site === 'undefined' || site === null || site == 'barrys'){
-  var site = "barrysbootcamp_2";
+  var site = "barrysbootcamp";
 }
 
 var publicPath = path+'public/data_miner/log/';
@@ -108,7 +108,6 @@ currentTime
 timeformat = 'llll';
 classTZ = 'America/New_York';
 var gap = {
-  'barrysbootcamp_2':15,
   'barrysbootcamp':15,
   'sbxboxing':10,
   'soulcycle':30
@@ -116,13 +115,12 @@ var gap = {
 var forceHourCheck = true;
 if (forceHourCheck === true) {
   gap = {
-    'barrysbootcamp':100,
-	'barrysbootcamp_2':100,
+    'barrysbootcamp':60,
     'sbxboxing':60,
     'soulcycle':60
   };
 }
-if (site == 'flywheel' || 'barrysbootcamp'){
+if (site == 'flywheel' || 'barrysbootcamp2'){
   casper.options.clientScripts = [
     path+"lib/jquery-3.2.1.min.js"
   ];
@@ -234,7 +232,7 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 		});
       });
       break;
-    case 'barrysbootcamp_2':
+    case 'barrysbootcamp':
       username = 'john.j@leanfwk.com';
       password = 'Afkalh!34';
       loginUrl = 'https://booking.barrysbootcamp.com/reserve/index.cfm?action=Account.login';
@@ -345,10 +343,6 @@ casper.start('https://www.barrysbootcamp.com/',function() {
                         classAvailableFloors = classFloors - classEnrolledFloors;
                       }
                     });
-					this.then(function(){
-						this.page.close();
-						this.page = require('webpage').create();
-					});
                   }
                   if(writeLog === true){
                     this.then(function(){
@@ -391,13 +385,14 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 		});
       });
       break;
-  case 'barrysbootcamp':
+  case 'barrysbootcamp2':
     username = 'james.k@leanfwk.com';
     password = 'Afkalh!34';
     //loginUrl = 'https://www.barrysbootcamp.com/login/chelsea/?mtredirect=https%3A%2F%2Fwww.barrysbootcamp.com%2Fschedule%2Fchelsea%2F%23%2Fweek%2F86688';
 	loginUrl = 'https://www.barrysbootcamp.com/login/chelsea/';
     accountUrl = 'https://www.barrysbootcamp.com/';  //'https://www.barrysbootcamp.com/my-account/'
     classesUrl = 'https://www.barrysbootcamp.com/schedule/';
+	evaluatefiles = [];
 	var today = new Date();
 	var currentDate= today.toISOString().substring(0, 10);
     this.thenOpen(loginUrl, function(){
@@ -422,228 +417,166 @@ casper.start('https://www.barrysbootcamp.com/',function() {
           // Start Type loop
 			this.eachThen(locations.all.Barrys, function(r){
 				classLocationId = r.data.studio_id;
-				classLocationNameOrig = r.data.name;
-				classLocationName = classLocationNameOrig.replace(/\s+/g, '-').toLowerCase();
+				classLocationName = r.data.name;
+				classLocationName = classLocationName.replace(/\s+/g, '-').toLowerCase();
 				var barryClassTZ = r.data.timezone;
 				var seats = JSON.parse(r.data.seat);
 				classSeats = seats.seats;
 				classFloors = seats.floors;
+                currentTime = moment().tz('America/New_York').format(timeformat);
+				var locationData = [];
 				this.thenOpen(classesUrl+classLocationName+'/#/week/',function(){
 					this.echo('opened page');
-
+					try {
 						this.waitForSelector('.MT_schedule-week__date-day', function(){
 							this.echo('waited for day');
 							this.wait(6000, function() {
 								var locId = this.evaluate(function(){
 										return jQuery('#mariana-schedule-week-routable-binding').attr('data-mariana-location-id');
 								});		  
-								// REFACTORED:  We used to collect ID's of just the register buttons but now we collect the whole object, so we can store closed classes
-								classlist = this.evaluate(function(selector){	
-														  var classlist=[];
-														if($(selector).length > 0){
-															  $.each($(selector),function(i,v){
-																	var sb = $(v);
-																	var classId = sb.find('.MT_schedule__register-button').attr('id');
-																	var classTime = sb.find('.MT_schedule__time').text().trim();
-																	var className = sb.find('.MT_schedule__class-name').text().trim();
-																	var className = className.substring(0, className.indexOf('('));
-																	var classLength = sb.find('.MT_schedule__duration').text().trim();
-																	var classInstructor = sb.find('.MT_schedule__instructor-name').text().trim();
-																	var month = $('.MT_schedule-week__day-button:first-of-type').find('.MT_schedule-week__date-month').text().trim();
-																	var day = $('.MT_schedule-week__day-button:first-of-type').find('.MT_schedule-week__date-day').text().trim();
-																	var dater = month+'/'+day;
-																	var classDate = new Date().getFullYear()+'/'+dater;
-																	
-																	var classFull = false;
-																	if (sb.find('.MT_schedule__waitlist-button').length) {
-																		classFull = true;
-																	} else if(sb.find('.MT_schedule__register-button').length){
-																		classFull = 'reserve';
-																	} else if(sb.find('.MT_schedule__class-cancelled').length){
-																		classFull = 'cancelled';
-																	}
-																	var co = {
-																	  'nth':i+1,
-																	  'classId':classId,
-																	  'classTime':classTime,
-																	  'className':className,
-																	  'classInstructor':classInstructor,
-																	  'classLength':classLength,
-																	  'classDate':classDate,
-																	  'classFull':classFull,
-																	};
-																	classlist.push(co);
-															  });
-														  }
-														  return classlist;
-														},{
-															selector:'.MT_schedule__table-row'
-														});
-								if(classlist !== null && classlist.length > 0){
-										this.eachThen(classlist, function(ee){
-												var row = ee.data;
-												if (classLocationId === 11 && forceHourCheck === false) {
-													classNow = moment().tz(barryClassTZ).add(91,'minutes');
-												}
-												var classNow = moment().tz(barryClassTZ).add(91,'minutes');
-												var writeLog = false;
-												this.wait(4000, function() {
-													currentTime = moment().tz('America/New_York').format(timeformat);
-													classTime = moment(row.classTime,["h:mm A"]).format("HH:mm");
-													classDate = moment(row.classDate+' '+classTime);
-													classDate = moment.tz(classDate.format(),'YYYY-MM-DDTHH:mm:ss',barryClassTZ);
-													// If we are within the booking window
-													// and if there is a reserve button or a waitlist button
-													if(classNow < classDate && (row.classFull === true || row.classFull === 'reserve' || row.classFull === 'cancelled')){
-														writeLog = true;
-													}
-													if((row.classFull === false || row.classFull == 'reserve') && writeLog === true) {
-														//this.waitForSelector('button#'+row.classId, function(){
-														this.waitForSelector(".MT_schedule__table-row:nth-of-type("+row.nth+") .MT_schedule__register-button", function(){
-															//this.click('button#'+row.classId);
-															this.click('.MT_schedule__table-row:nth-of-type('+row.nth+') .MT_schedule__register-button');
-															this.echo('waiting for map');
-															this.once('url.changed',function(url) {
-																if(url.indexOf('mtredirect')>=0){
-																	this.echo('redirected us again');
-																	this.reload();
-																	this.waitForSelector('form.MT_login__form',function(){
-																		this.fillSelectors('form.MT_login__form', {
-																			'input[id="MT_login__username"]' : username,
-																			'input[id="MT_login-password"]' : password
-																		//},true);
-																		});
-																		//this.click('button[type="submit"]');
-																		//this.click('button.MT_login__login-button');
-																		this.clickLabel('Login','button');
-																	});
-																	this.then(function(){
-																		this.page.close();
-																		this.page = require('webpage').create();
-																	});
-																	this.thenOpen(classesUrl+classLocationName+'/#/week/',function(){
-																		this.echo('supposedly we are logged in and back to the previous page');
-																		this.wait(7000, function() {
-																			if(casper.exists(".MT_schedule__table-row:nth-of-type("+row.nth+") .MT_schedule__register-button")){
-																				this.click('.MT_schedule__table-row:nth-of-type('+row.nth+') .MT_schedule__register-button');
-																			}
-																		});
-																	});
-																}
-															});
-														}, function timeout(){
-																this.reload();
-																this.echo('that selector was not showing for no good reason, so I am refreshing');
-																this.click('.MT_schedule__table-row:nth-of-type('+row.nth+') .MT_schedule__register-button');
-																this.echo('waiting for map');
-																this.once('url.changed',function(url) {
-																	if(url.indexOf('mtredirect')>=0){
-																		this.echo('redirected us again');
-																		this.reload();
-																		this.waitForSelector('form.MT_login__form',function(){
-																			this.fillSelectors('form.MT_login__form', {
-																				'input[id="MT_login__username"]' : username,
-																				'input[id="MT_login-password"]' : password
-																			//},true);
-																			});
-																			//this.click('button[type="submit"]');
-																			//this.click('button.MT_login__login-button');
-																			this.clickLabel('Login','button');
-																		});
-																		this.then(function(){
-																			this.page.close();
-																			this.page = require('webpage').create();
-																		});
-																		this.thenOpen(classesUrl+classLocationName+'/#/week/',function(){
-																			this.echo('supposedly we are logged in and back to the previous page');
-																			this.wait(7000, function() {
-																				if(casper.exists(".MT_schedule__table-row:nth-of-type("+row.nth+") .MT_schedule__register-button")){
-																					this.click('.MT_schedule__table-row:nth-of-type('+row.nth+') .MT_schedule__register-button');
-																				}
-																			});
-																		});
-																	}
-																});
-														});
-														this.waitForSelector('.MT_layout-spot--reserved', function(){
-																//this.waitForSelector('#mariana-schedule-week-routable-binding', function(){
-																//var classId = this.getCurrentUrl().substr(this.getCurrentUrl().lastIndexOf('/') + 1);
-																this.echo('reached map');
-																// Refactor we need to collect floors and treads separately
-																classEnrolledFloors = 0;
-																classAvailableFloors = 0;
-																classEnrolledSeats = this.evaluate(function(){
-																	return $('.MT_layout-spot--reserved').length;
-																});
-																classAvailableSeats = this.evaluate(function(){
-																	return $('.MT_layout-spot--available').length;
-																});
-																/*if((classAvailableSeats.length && classAvailableSeats > 0) || (classEnrolledSeats.length && classEnrolledSeats < (classSeats + classFloors))){
-																	var writeLog = true;
-																} else {
-																	var writeLog = false;
-																}*/
-																/*classSeats = this.evaluate(function(){
-																	return $('.MT_layout-spot').length;
-																});*/
-														}, function timeout(){
-																this.echo('timed out but moving on');
-														});
-														this.back();
-													} else if(row.classFull=='cancelled'){
-																classAvailableSeats = classSeats
-																classAvailableFloors = classFloors;
-																classEnrolledSeats = classEnrolledFloors = 0;
-													} else {
-																// if class is full
-																classAvailableSeats = classAvailableFloors = 0;
-																classEnrolledSeats = classSeats;
-																classEnrolledFloors = classFloors;
-																// end if class is full
-													}
-													if(writeLog === true){
-														classCsvLineArray = [
-																				currentTime,				//set
-																				row.className,				//set
-																				classLocationNameOrig,		//set
-																				row.classInstructor,		//set
-																				classDate.format(timeformat),					//set
-																				//classDate+' '+classTime,	//set
-																				row.classLength,			//set
-																				classFloors,				//refactor
-																				classEnrolledFloors,		//refactor
-																				classAvailableFloors,		//refactor
-																				classSeats,					//set
-																				classEnrolledSeats,			//set
-																				classAvailableSeats,		//set
-																				//classLocationId,			//set
-																				classDate.format(timeformat)
-																				//classId,				//set
-																				//'classTime',
-																			];
-														this.echo(classCsvLineArray);
-														// spots = MT_layout-spot
-														// reserved = MT_layout-spot--reserved
-														// available = MT_layout-spot--available
-														writeFile(site,classCsvLineArray,classLocationId,barryClassTZ);
-													}
-												});										
-										});
-								} else {
-									this.echo('class list is empty');
+								var bookingURL = 'https://barrysbootcamp.marianatek.com/api/class_sessions?location='+locId+'&max_date='+currentDate+'&min_date='+currentDate;
+								classlist = [];
+								selector ='.MT_schedule__register-button';
+								if(casper.exists(selector)){
+									classlist = this.evaluate(function(selector){
+													var classlist=[];
+													$.each($(selector),function(i,v){
+														var sb = $(v);
+														var classId = sb.attr('id');
+														classlist.push(classId);
+													});
+													return classlist;
+												},{
+													selector:'.MT_schedule__register-button'
+												});
 								}
+								this.then(function(){
+									evaluatefiles.push(bookingURL);
+									this.echo(classlist);
+								});
+								this.then(function(){
+									this.each(classlist, function(id,classId){
+											this.wait(7000, function() {
+												if(casper.exists('#'+classId)){
+													this.click('#'+classId);
+													this.echo('waiting for map');
+													this.on('url.changed',function(url) {
+														if(url.indexOf('mtredirect')>=0){
+															this.echo('redirected us again');
+															this.reload();
+															this.waitForSelector('form.MT_login__form',function(){
+																this.fillSelectors('form.MT_login__form', {
+																	'input[id="MT_login__username"]' : username,
+																	'input[id="MT_login-password"]' : password
+																//},true);
+																});
+																//this.click('button[type="submit"]');
+																//this.click('button.MT_login__login-button');
+																this.clickLabel('Login','button');
+															});
+															this.thenOpen(classesUrl+classLocationName+'/#/week/',function(){
+																this.echo('supposedly we are logged in and back to the previous page');
+																this.wait(7000, function() {
+																	if(casper.exists('#'+classId)){
+																		this.echo(classID+' exists');
+																		this.click('#'+classId);
+																	}
+																});
+															});
+														}
+													})
+													this.waitForSelector('.MT_register-flow__map', function(){
+													//this.waitForSelector('#mariana-schedule-week-routable-binding', function(){
+															this.echo('reached map');
+															var identifier = this.getCurrentUrl().substr(this.getCurrentUrl().lastIndexOf('/') + 1);
+															var classHeader = this.evaluate(function(){
+																return document.querySelector('.MT_register-flow__heading').innerText;
+															});
+															var classInstructor = this.evaluate(function(){
+																return document.querySelector('.MT_register-flow__instructor-name').innerText;
+															});
+															var classTime = this.evaluate(function(){
+																var timer = document.querySelector('.MT_register-flow__class-time').innerText;
+																return timer.substring(0, timer.indexOf('-'));;
+															});
+															var classDate = this.evaluate(function(){
+																return document.querySelector('.MT_register-flow__class-date').innerText;
+															});
+															var classLength = classHeader.substring(classHeader.lastIndexOf("(")+1,classHeader.lastIndexOf(")"));
+															var className = classHeader.substring(0, classHeader.indexOf('('));
+															// Refactor we need to collect floors and treads separately
+															classEnrolledFloors = 0;
+															classAvailableFloors = 0;
+															classEnrolledSeats = this.evaluate(function(){
+																return $('.MT_layout-spot--reserved').length;
+															});
+															classAvailableSeats = this.evaluate(function(){
+																return $('.MT_layout-spot--available').length;
+															});
+															/*classSeats = this.evaluate(function(){
+																return $('.MT_layout-spot').length;
+															});*/
+															var classDetails = {
+															  'classLocationId':classLocationId,
+															  'classLocationName':classLocationName,
+															  'classId':identifier,
+															  'classLength':classLength,
+															  'className':className,
+															  'classInstructor':classInstructor,
+															  'classTime':classTime,
+															  'classDate':classDate,
+																'classSeats':classSeats,
+																'classEnrolledSeats':classEnrolledSeats,
+																'classAvailableSeats':classAvailableSeats,
+															}
+															classDate = moment(classDate+' '+classTime);
+															classDate = moment.tz(classDate.format(),'YYYY-MM-DDTHH:mm:ss', barryClassTZ);
+															classCsvLineArray = [
+																currentTime,
+																className,
+																classLocationName,
+																classInstructor,
+																classDate,
+																//classDate+' '+classTime,
+																classLength,
+																classFloors,
+																classEnrolledFloors,
+																classAvailableFloors,
+																classSeats,
+																classEnrolledSeats,
+																classAvailableSeats,
+																classLocationId,
+																//'identifier',
+																//'classTime',
+															];
+															this.echo(classCsvLineArray);
+															locationData.push(classCsvLineArray);
+															// spots = MT_layout-spot
+															// reserved = MT_layout-spot--reserved
+															// available = MT_layout-spot--available
+															this.echo(classCsvLineArray);
+															writeFile(site,classCsvLineArray,classLocationId,barryClassTZ);
+													});
+													this.back();
+												} else {
+													this.echo('register button does not exist');
+												}
+											});										
+									});
+								});
 							});
-						}, function timeout(){
-								this.echo('timed out but moving on');
 						});
-
+					} catch (err) {
+						// do nothing
+					}
 					this.then(function(){
-						this.page.close();
-						this.page = require('webpage').create();
+						//writeHTML(classLocationName,currentDate,locationData);
+						//writeFile(site,locationData,classLocationId);
 					});
 				});
 			});
 			this.then(function(){
+				//writeHTML('NY',currentDate,evaluatefiles);
 				this.page.close();
 				this.page = require('webpage').create();
 			});
@@ -961,17 +894,18 @@ var getCount = function(checkStr,returnCount){
 
 var writeFile = function(site,classCsvLineArray,classLocationId,classTZ){
   var withinTen;
+  var fileSingle = file+'_'+site+'_'+classLocationId+'.csv';
   switch (site) {
-    case 'barrysbootcamp_2':
-      withinTen = moment().tz(classTZ).add(gap[site]+11,'minutes');
-      if (classLocationId === 11 && forceHourCheck === false) {
-        withinTen = moment().tz(classTZ).add(91,'minutes');
-      }
-      break;
     case 'barrysbootcamp':
       withinTen = moment().tz(classTZ).add(gap[site]+11,'minutes');
       if (classLocationId === 11 && forceHourCheck === false) {
-        withinTen = moment().tz(classTZ).add(91,'minutes');
+        withinTen = moment().tz(classTZ).add(71,'minutes');
+      }
+      break;
+    case 'barrysbootcamp2':
+      withinTen = moment().tz(classTZ).add(gap[site]+11,'minutes');
+      if (classLocationId === 11 && forceHourCheck === false) {
+        withinTen = moment().tz(classTZ).add(71,'minutes');
       }
       break;
     case 'soulcycle':
@@ -987,7 +921,6 @@ var writeFile = function(site,classCsvLineArray,classLocationId,classTZ){
       break;
 
   }
-  var fileSingle = file+'_'+site+'_'+classLocationId+'.csv';
 
   // Date, Name, Location, Instructor, Datetime, Length, Floors, Enrolled floors, Open floors, Seats, Enrolled seats, Open seats
   // Add header if file is new
