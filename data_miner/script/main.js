@@ -108,16 +108,14 @@ currentTime
 timeformat = 'llll';
 classTZ = 'America/New_York';
 var gap = {
-  'barrysbootcamp_2':15,
-  'barrysbootcamp':15,
+  'barrysbootcamp':10,
   'sbxboxing':10,
   'soulcycle':30
 };
 var forceHourCheck = true;
 if (forceHourCheck === true) {
   gap = {
-    'barrysbootcamp':100,
-	'barrysbootcamp_2':100,
+    'barrysbootcamp':10,
     'sbxboxing':60,
     'soulcycle':60
   };
@@ -234,163 +232,6 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 		});
       });
       break;
-    case 'barrysbootcamp_2':
-      username = 'john.j@leanfwk.com';
-      password = 'Afkalh!34';
-      loginUrl = 'https://booking.barrysbootcamp.com/reserve/index.cfm?action=Account.login';
-      accountUrl = 'https://booking.barrysbootcamp.com/reserve/index.cfm?action=Account.info';
-      classesUrl = 'https://booking.barrysbootcamp.com/reserve/index.cfm?action=Reserve.chooseClass&site=';
-      classUrl = 'https://booking.barrysbootcamp.com/reserve/index.cfm?action=Reserve.chooseSpot&classid=';
-      this.thenOpen(loginUrl, function(){
-        this.waitForSelector('form[name="loginForm"]', function() {
-          this.fillSelectors('form[name="loginForm"]', {
-            'input[name="username"]' : username,
-            'input[name="password"]' : password
-          }, true);
-          this.waitForUrl(accountUrl,function(){
-            //this.echo('Logged into sbxboxing');
-          },function(){
-            this.echo('Failed to login');
-          });
-
-          // Start Type loop
-          this.eachThen(locations.all.Barrys, function(r){
-            classLocationId = r.data.studio_id;
-            var barryClassTZ = r.data.timezone;
-            classAll = [];
-            var seats = JSON.parse(r.data.seat);
-            classSeats = seats.seats;
-            classFloors = seats.floors;
-            this.thenOpen(classesUrl+classLocationId,function(){
-              classLocationTitle = this.getHTML('.page-header.classes h1').trim();
-              // Set selector based on datalength
-              selector = '.tab-pane.active .scheduleBlock:not(.empty)';
-              switch (length) {
-                case 'week':
-                  selector = '.scheduleBlock:not(.empty)';
-                  break;
-              }
-              // Get possible classes
-              classes = this.evaluate(function(selector){
-                var classes=[];
-                if($(selector).length){
-                  $.each($(selector),function(i,v){
-                    var sb = $(v);
-                    var classId = sb.data('classid');
-                    var classTime = sb.find('.scheduleTime').text().trim();
-                    var className = sb.find('.scheduleClass').text().trim();
-                    var classInstructor = sb.find('.scheduleInstruc').text().trim();
-                    var classLength = sb.find('.classlength').text().trim();
-                    var classDate = sb.siblings('h3').text().trim();
-                    var classFull = false;
-                    if (sb.find('.badge.waitlist').length || sb.find('.badge.full').length) {
-                      classFull = true;
-                    }
-                    var co = {
-                      'classId':classId,
-                      'classTime':classTime,
-                      'className':className,
-                      'classInstructor':classInstructor,
-                      'classLength':classLength,
-                      'classDate':classDate,
-                      'classFull':classFull,
-                    };
-                    classes.push(co);
-                  });
-                }
-                return classes;
-              },{
-                selector:selector
-              });
-              if(classes !== null){
-                //this.echo('POSSIBLE CLASSES: '+classes.length);
-
-                // Loop through classes
-                this.eachThen(classes, function(rr){
-                  var co = rr.data;
-                  var classNow = moment().tz(barryClassTZ).add(gap[site],'minutes');
-                  if (classLocationId === 11 && forceHourCheck === false) {
-                    classNow = moment().tz(barryClassTZ).add(60,'minutes');
-                  }
-                  var writeLog = false;
-                  currentTime = moment().tz('America/New_York').format(timeformat);
-                  classDate = moment(co.classDate+' '+co.classTime);
-                  classDate = moment.tz(classDate.format(),'YYYY-MM-DDTHH:mm:ss', barryClassTZ);
-
-                  if(classNow < classDate ){
-                    writeLog = true;
-                  }
-                  // if class is full
-                  classAvailableSeats = classAvailableFloors = 0;
-                  classEnrolledSeats = classSeats;
-                  classEnrolledFloors = classFloors;
-                  if (co.classFull !== true && writeLog === true) {
-                    this.thenOpen(classUrl+co.classId,function(){
-                      var currentUrl = this.getCurrentUrl();
-                      if (currentUrl == classUrl+co.classId){
-                        // classSeats = this.evaluate(function(){
-                        //   return $('.spotcell:not(.floor)').length;
-                        // });
-                        classEnrolledSeats = this.evaluate(function(){
-                          return $('.spotcell.Enrolled:not(.floor)').length;
-                        });
-                        classAvailableSeats = classSeats - classEnrolledSeats;
-
-                        // classFloors = this.evaluate(function(){
-                        //   return $('.spotcell.floor').length;
-                        // });
-                        classEnrolledFloors = this.evaluate(function(){
-                          return $('.spotcell.Enrolled.floor').length;
-                        });
-                        classAvailableFloors = classFloors - classEnrolledFloors;
-                      }
-                    });
-					this.then(function(){
-						this.page.close();
-						this.page = require('webpage').create();
-					});
-                  }
-                  if(writeLog === true){
-                    this.then(function(){
-                      var classCsvLineArray = [
-                        currentTime,
-                        co.className,
-                        classLocationTitle,
-                        co.classInstructor,
-                        classDate.format(timeformat),
-                        co.classLength,
-                        classFloors,
-                        classEnrolledFloors,
-                        classAvailableFloors,
-                        classSeats,
-                        classEnrolledSeats,
-                        classAvailableSeats,
-                        co.classId
-                      ];
-                      classAll.push(classCsvLineArray);
-                      writeFile(site,classCsvLineArray,classLocationId,barryClassTZ);
-                    });
-                  }
-
-
-                });
-
-              }
-              // Write Summary File
-              // this.then(function(){
-              //   if(length !== 'day'){
-              //     writeSummary(site,classAll,classLocationId,classLocationTitle,classDay);
-              //   }
-              // });
-            });
-          });
-        });
-		this.then(function(){
-			this.page.close();
-			this.page = require('webpage').create();
-		});
-      });
-      break;
   case 'barrysbootcamp':
     username = 'james.k@leanfwk.com';
     password = 'Afkalh!34';
@@ -483,13 +324,14 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 										this.eachThen(classlist, function(ee){
 												var row = ee.data;
 												if (classLocationId === 11 && forceHourCheck === false) {
-													classNow = moment().tz(barryClassTZ).add(91,'minutes');
+													classNow = moment().tz(barryClassTZ).add(130,'minutes');
 												}
-												var classNow = moment().tz(barryClassTZ).add(91,'minutes');
+												var classNow = moment().tz(barryClassTZ).add(gap[site],'minutes');
 												var writeLog = false;
 												this.wait(4000, function() {
 													currentTime = moment().tz('America/New_York').format(timeformat);
 													classTime = moment(row.classTime,["h:mm A"]).format("HH:mm");
+													console.log(row.classDate+' '+classTime);
 													classDate = moment(row.classDate+' '+classTime);
 													classDate = moment.tz(classDate.format(),'YYYY-MM-DDTHH:mm:ss',barryClassTZ);
 													// If we are within the booking window
@@ -535,7 +377,6 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 																this.reload();
 																this.echo('that selector was not showing for no good reason, so I am refreshing');
 																this.click('.MT_schedule__table-row:nth-of-type('+row.nth+') .MT_schedule__register-button');
-																this.echo('waiting for map');
 																this.once('url.changed',function(url) {
 																	if(url.indexOf('mtredirect')>=0){
 																		this.echo('redirected us again');
@@ -565,10 +406,9 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 																	}
 																});
 														});
-														this.waitForSelector('.MT_layout-spot--reserved', function(){
+														this.waitForSelector('.MT_layout-spot--available', function(){
 																//this.waitForSelector('#mariana-schedule-week-routable-binding', function(){
 																//var classId = this.getCurrentUrl().substr(this.getCurrentUrl().lastIndexOf('/') + 1);
-																this.echo('reached map');
 																// Refactor we need to collect floors and treads separately
 																classEnrolledFloors = 0;
 																classAvailableFloors = 0;
@@ -578,6 +418,10 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 																classAvailableSeats = this.evaluate(function(){
 																	return $('.MT_layout-spot--available').length;
 																});
+																var totalSpots = classSeats + classFloors;
+																if(classEnrolledSeats==totalSpots){
+																	writeLog = false;
+																}
 																/*if((classAvailableSeats.length && classAvailableSeats > 0) || (classEnrolledSeats.length && classEnrolledSeats < (classSeats + classFloors))){
 																	var writeLog = true;
 																} else {
@@ -587,21 +431,33 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 																	return $('.MT_layout-spot').length;
 																});*/
 														}, function timeout(){
-																this.echo('timed out but moving on');
+																this.waitForSelector('.MT_register-flow__pick-button', function(){
+																	writeLog = false;
+																}, function timeout(){
+																	writeLog = false;
+																});
 														});
 														this.back();
 													} else if(row.classFull=='cancelled'){
-																classAvailableSeats = classSeats
+																classAvailableSeats = classSeats;
 																classAvailableFloors = classFloors;
 																classEnrolledSeats = classEnrolledFloors = 0;
-													} else {
+													} else if(row.classFull === true){
 																// if class is full
 																classAvailableSeats = classAvailableFloors = 0;
 																classEnrolledSeats = classSeats;
 																classEnrolledFloors = classFloors;
 																// end if class is full
+																var classJumpChecks = moment().tz(barryClassTZ).add(240,'minutes');
+																var classJumpChecksTwo = moment().tz(barryClassTZ).add(61,'minutes');
+																if(classJumpChecks > classDate && classJumpChecksTwo < classDate){
+																	var writeLog = false;
+																}
+													} else {
+														writeLog = false;
 													}
 													if(writeLog === true){
+														console.log('write log is true');
 														classCsvLineArray = [
 																				currentTime,				//set
 																				row.className,				//set
@@ -621,10 +477,6 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 																				//classId,				//set
 																				//'classTime',
 																			];
-														this.echo(classCsvLineArray);
-														// spots = MT_layout-spot
-														// reserved = MT_layout-spot--reserved
-														// available = MT_layout-spot--available
 														writeFile(site,classCsvLineArray,classLocationId,barryClassTZ);
 													}
 												});										
@@ -971,7 +823,7 @@ var writeFile = function(site,classCsvLineArray,classLocationId,classTZ){
     case 'barrysbootcamp':
       withinTen = moment().tz(classTZ).add(gap[site]+11,'minutes');
       if (classLocationId === 11 && forceHourCheck === false) {
-        withinTen = moment().tz(classTZ).add(91,'minutes');
+        withinTen = moment().tz(classTZ).add(131,'minutes');
       }
       break;
     case 'soulcycle':

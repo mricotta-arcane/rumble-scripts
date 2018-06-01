@@ -70,47 +70,79 @@ casper.waitForSelector('form.well', function() {
 });
 
 casper.then(function(){
-	casper.thenOpen(bookerUrl, function(){
-		// If we're prompted by the point of sale form, which occurs on redirect to URL https://rumble.zingfitstudio.com/index.cfm?action=Register.chooseSite, then we have to fill out the form... we're gonna try bypassing it entirely
-		this.waitForUrl(bookerUrl);
-	});
+	var ur = this.getCurrentUrl();
+	if(ur.indexOf('chooseSite')>=0){
+				this.echo('url redirected');
+				this.waitForSelector('form[name="siteform"]',function(){
+					this.then(function(){
+						this.click('input[value="12900000001"]');
+					});
+					this.then(function(){
+						this.click('button[type="submit"]');
+					});
+				});
+	}
+});
 
-	casper.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard', function(){
-		this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
+casper.then(function(){
+	casper.thenOpen(bookerUrl, function(){
+		this.once('url.changed',function(url) {
+			this.echo('url changed');
+			var ur = this.getCurrentUrl();
+			if(ur.indexOf('chooseSite')>=0){
+				this.echo('url redirected');
+				this.waitForSelector('form[name="siteform"]',function(){
+					this.then(function(){
+						this.click('input[value="12900000001"]');
+					});
+					this.then(function(){
+						this.click('button[type="submit"]');
+					});
+				});
+			}
+		});
 	});
+	this.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard', function(){
+		this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
+	})
 });
 
 casper.then(function(){
 	// This is all 3 of the class attendance reports
 	Object.keys(attendanceReports).forEach(function(index){							//  For each of the attendance reports, execute for this current entire year.
 		var identifier = attendanceReports[index];
-		var reportpage = attendanceReportURL+identifier+'&start=1%2F1%2F'+currentYear+'&end=6%2F30%2F'+currentYear+'&export=csv';
-		var reporttoday = attendanceReportURL+identifier+'&start='+currentMonth+'%2F'+currentDate+'%2F'+currentYear+'&end='+currentMonth+'%2F'+currentDate+'%2F'+currentYear+'&export=csv';
-		//casper.download(reportpage,logs+"attendance/attendance_"+index+"_"+currentMonth+"-"+currentYear+".csv");
-		// Get full year data
-		casper.download(reportpage,logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv");
-		// Get "today" data
-		casper.download(reporttoday,logs+"attendance/attendance_"+index+"_today.tmp.csv");
-		// Only store full year data if it is valid
-		var fileSizeInBytes = fs.size(logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv");
-		var contents = fs.read(logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv");
-		var substr = contents.indexOf('System Error');
-		if((fileSizeInBytes > 500) && (substr == -1)){	// if filesize is greater than 500 and does not contain string
-			if(fs.exists(logs+"attendance/attendance_"+index+"_"+currentYear+".csv")){
-				fs.remove(logs+"attendance/attendance_"+index+"_"+currentYear+".csv");
+		casper.thenOpen(attendanceReportURL+identifier+'&start=1%2F1%2F'+currentYear+'&end=6%2F30%2F'+currentYear, function(){
+			
+		});
+		casper.then(function(){
+			var reportpage = attendanceReportURL+identifier+'&start=1%2F1%2F'+currentYear+'&end=6%2F30%2F'+currentYear+'&export=csv';
+			var reporttoday = attendanceReportURL+identifier+'&start='+currentMonth+'%2F'+currentDate+'%2F'+currentYear+'&end='+currentMonth+'%2F'+currentDate+'%2F'+currentYear+'&export=csv';
+			//casper.download(reportpage,logs+"attendance/attendance_"+index+"_"+currentMonth+"-"+currentYear+".csv");
+			// Get full year data
+			casper.download(reportpage,logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv");
+			// Get "today" data
+			casper.download(reporttoday,logs+"attendance/attendance_"+index+"_today.tmp.csv");
+			// Only store full year data if it is valid
+			var fileSizeInBytes = fs.size(logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv");
+			var contents = fs.read(logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv");
+			var substr = contents.indexOf('System Error');
+			if((fileSizeInBytes > 500) && (substr == -1)){	// if filesize is greater than 500 and does not contain string
+				if(fs.exists(logs+"attendance/attendance_"+index+"_"+currentYear+".csv")){
+					fs.remove(logs+"attendance/attendance_"+index+"_"+currentYear+".csv");
+				}
+				fs.move(logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv",logs+"attendance/attendance_"+index+"_"+currentYear+".csv");
 			}
-			fs.move(logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv",logs+"attendance/attendance_"+index+"_"+currentYear+".csv");
-		}
-		// Only store today data if it is valid
-		var fileSizeInBytes = fs.size(logs+"attendance/attendance_"+index+"_today.tmp.csv");
-		var contents = fs.read(logs+"attendance/attendance_"+index+"_today.tmp.csv");
-		var substr = contents.indexOf('System Error');
-		if((fileSizeInBytes > 500) && (substr == -1)){	// if filesize is greater than 500 and does not contain string
-			if(fs.exists(logs+"attendance/attendance_"+index+"_today.csv")){
-				fs.remove(logs+"attendance/attendance_"+index+"_today.csv");
+			// Only store today data if it is valid
+			var fileSizeInBytes = fs.size(logs+"attendance/attendance_"+index+"_today.tmp.csv");
+			var contents = fs.read(logs+"attendance/attendance_"+index+"_today.tmp.csv");
+			var substr = contents.indexOf('System Error');
+			if((fileSizeInBytes > 500) && (substr == -1)){	// if filesize is greater than 500 and does not contain string
+				if(fs.exists(logs+"attendance/attendance_"+index+"_today.csv")){
+					fs.remove(logs+"attendance/attendance_"+index+"_today.csv");
+				}
+				fs.move(logs+"attendance/attendance_"+index+"_today.tmp.csv",logs+"attendance/attendance_"+index+"_today.csv");
 			}
-			fs.move(logs+"attendance/attendance_"+index+"_today.tmp.csv",logs+"attendance/attendance_"+index+"_today.csv");
-		}
+		});
 	});
 });
 

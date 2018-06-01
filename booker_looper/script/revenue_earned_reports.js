@@ -58,6 +58,7 @@ var currentYearFull = new Date().getFullYear().toString();			// Gets full year
 var currentYear = currentYearFull.substr(-2);						// Gets 2 digit year
 var eom = new Date(currentYearFull, currentMonth, 0).toString().substr(8,2);	// end of this month
 var eolm = new Date(currentYearFull, lastMonth, 0).toString().substr(8,2);		// end of last month
+var bookerUrl = 'https://rumble.zingfitstudio.com/index.cfm?action=Booker.view';
 	
 var months = ['1','2','3','4','5','6','7','8','9','10','11','12'];
 
@@ -72,6 +73,8 @@ casper.waitForSelector('form.well', function() {
   }, true);
 });
 
+/*
+6-1-2018
 /*casper.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Booker.view', function(){
 	// If we're prompted by the point of sale form, which occurs on redirect to URL https://rumble.zingfitstudio.com/index.cfm?action=Register.chooseSite, then we have to fill out the form... we're gonna try bypassing it entirely
 	this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Booker.view');
@@ -81,6 +84,33 @@ casper.waitForSelector('form.well', function() {
 	this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
 });*/
 // This runs a loop of all months of ER Expired Series (First Time)
+casper.then(function(){
+	casper.thenOpen(bookerUrl, function(){
+		this.once('url.changed',function(url) {
+			this.echo('url changed');
+			if(this.getCurrentUrl().indexOf('chooseSite')>=0){
+				this.echo('url redirected');
+				this.waitForSelector('form.[name="siteform"]',function(){
+					this.click('input[value="12900000001"]',function(){
+								this.echo('filled form');
+								this.click('button[type="submit"]');
+						});
+				});
+				this.thenOpen(bookerUrl, function(){
+					this.echo('waiting for booker');
+					this.waitForUrl(bookerUrl);
+				});
+			} else {
+				//this.echo(this.getCurrentUrl());
+				//this.waitForUrl(bookerUrl);
+			}
+		});
+	});
+	this.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard', function(){
+		this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
+	});
+});
+
 
 casper.then(function(){
 	var index = 'FirstTime';

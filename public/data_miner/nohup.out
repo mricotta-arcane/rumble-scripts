@@ -1,0 +1,25 @@
+Script Started
+PHP Notice:  Undefined offset: 2 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 12
+PHP Notice:  Undefined offset: 0 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 24
+PHP Notice:  Undefined offset: 0 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 26
+PHP Notice:  Undefined offset: 2 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 28
+PHP Notice:  Undefined offset: 2 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 29
+PHP Notice:  Undefined offset: 2 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 30
+PHP Notice:  Undefined offset: 2 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 31
+PHP Warning:  array_count_values(): Can only count STRING and INTEGER values! in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 32
+PHP Warning:  array_count_values(): Can only count STRING and INTEGER values! in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 32
+PHP Warning:  array_count_values(): Can only count STRING and INTEGER values! in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 32
+PHP Warning:  array_count_values(): Can only count STRING and INTEGER values! in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 32
+PHP Warning:  max(): Array must contain at least one element in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 33
+PHP Notice:  Undefined offset: 0 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 24
+PHP Notice:  Undefined offset: 0 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 26
+PHP Notice:  Undefined offset: 2 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 28
+PHP Notice:  Undefined offset: 2 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 29
+PHP Notice:  Undefined offset: 2 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 30
+PHP Notice:  Undefined offset: 2 in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 31
+PHP Warning:  array_count_values(): Can only count STRING and INTEGER values! in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 32
+PHP Warning:  array_count_values(): Can only count STRING and INTEGER values! in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 32
+PHP Warning:  array_count_values(): Can only count STRING and INTEGER values! in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 32
+PHP Warning:  array_count_values(): Can only count STRING and INTEGER values! in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 32
+PHP Warning:  max(): Array must contain at least one element in /var/www/html2/rumble-scripts/public/data_miner/summaryWriter.php on line 33
+Script Finished /var/www/html2/rumble-scripts/public/data_miner/log/scraper_week_soulcycle_9.csv

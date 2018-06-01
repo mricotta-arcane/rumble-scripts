@@ -1,5 +1,5 @@
 <?php
-echo "Script Started";
+print('Script Started'."\r\n");
 
 /*
 	Accepts argument of:
@@ -17,21 +17,25 @@ if (defined('STDIN')) {
 
 summaryWriter($start,$end);
 
-function getTitle($rows,$website){
-  $count = count($rows);
-  $half = (int)$count/2;
-  $firstRow = reset($rows);
-  $middleRow = $rows[$half];
-  $lastRow = end($rows);
-  $randomRow = $rows[rand(0,$count-1)];
-  $nameArray = [];
-  $nameArray[] = rowIntoArray($firstRow)[2];
-  $nameArray[] = rowIntoArray($middleRow)[2];
-  $nameArray[] = rowIntoArray($lastRow)[2];
-  $nameArray[] = rowIntoArray($randomRow)[2];
-  $c = array_count_values($nameArray);
-  $name = array_search(max($c), $c);
-  return $name;
+function getTitle($rows){
+	try {
+	  $count = count($rows);
+	  $half = (int)$count/2;
+	  $firstRow = reset($rows);
+	  $middleRow = $rows[$half];
+	  $lastRow = end($rows);
+	  $randomRow = $rows[rand(0,$count-1)];
+	  $nameArray = [];
+	  $nameArray[] = rowIntoArray($firstRow)[2];
+	  $nameArray[] = rowIntoArray($middleRow)[2];
+	  $nameArray[] = rowIntoArray($lastRow)[2];
+	  $nameArray[] = rowIntoArray($randomRow)[2];
+	  $c = array_count_values($nameArray);
+	  $name = array_search(max($c), $c);
+	  return $name;
+	}  catch (Exception $e) {
+		echo 'Caught exception: ',  $e->getMessage(), "\n";
+	}
 }
 
 function summaryWriter($start=null,$end=null){
@@ -68,7 +72,7 @@ function summaryWriter($start=null,$end=null){
   $title = '';
   $logs = scandir($dir,1);
   date_default_timezone_set("America/New_York");
-  if(!isset($first)){
+  if(!isset($start)){
 	$yesterday = date("M j, Y ", time() - 60 * 60 * 24);
   } else {
 	$yesterday = date("M j, Y ", strtotime($start));
@@ -90,49 +94,57 @@ function summaryWriter($start=null,$end=null){
   } else {
     $fileClass = fopen($dir.'class_summary.csv', "a");
   }
+
   
 	$dates = [];
 	if(isset($end)){
 		$datediff = strtotime($end) - strtotime($start);
 		$num_days = round($datediff / (60 * 60 * 24));
-		for($i=0; $i<$num_days; $i++){
+		for($i=0; $i<=$num_days; $i++){
 			// In the first iteration, $yesterday = $start, so we want to add (i) # days to $start
 			$add = $i*(60 * 60 * 24);
-			$yesterday = strtotime($yesterday) + $add;
-			$dd = date("M j, Y ", strtotime($yesterday));
+			$today = date("M j, Y ", strtotime($yesterday)+$add);
+			$dd = date("M j, Y ", strtotime($today));
 			$dates[] = $dd;
 		}
 	} else {
 		$dates[] = $yesterday;
 	}
-	foreach($dates as $yesterday){
-			foreach($logs as $log){
-				$classes = [];
-				// If it's a day log, we'll use it
-				$name = basename($log, ".csv").PHP_EOL;
-				if(strpos($name, 'scraper_day') !== false){
-				  // find all data for yesterday.  we reverse the array for faster execution
-				  $contents = file($dir.$log);
-				  $rows = array_reverse($contents);
-				  unset($contents);
-				  $parts = explode('_',$name);
-				  $length = $parts[1];
-				  $website = $parts[2];
-				  $locationID = $parts[3];
-				  $title = getTitle($rows,$website);
-				  //echo "File: $log\r\n";
-				  //var_dump($title);
-				  foreach($rows as $k=>$row){
-				if(strlen($row)==0||empty($row)){
-					continue;
-				}
+
+	foreach($logs as $log){
+		if($log=='.'||$log=='..'){
+			continue;
+		}
+		$classes = [];
+		// If it's a day log, we'll use it
+		$name = basename($log, ".csv").PHP_EOL;
+		if(strpos($name, 'scraper_day') !== false){
+			// find all data for yesterday.  we reverse the array for faster execution
+			$contents = null;
+			if(($contents = file($dir.$log))===FALSE){
+				continue;
+			}			
+			//foreach($dates as $yesterday){
+				$rows = array_reverse($contents);
+				$parts = explode('_',$name);
+				$length = $parts[1];
+				$website = $parts[2];
+				$locationID = $parts[3];
+				$title = getTitle($rows);
+				foreach($rows as $k=>$row){
+					if(strlen($row)==0||empty($row)){
+						continue;
+					}
+					if(strpos($row,';;;')!==false){
+						continue;
+					}
 					$r = explode(';',$row);
 					$true = null;
 					$full = 0;
-					if(count($r)>=10 && strpos($r[4],$yesterday)) {
+					$yes2 = date('M d, Y',strtotime($yesterday));
+					if(count($r)>=10 && (strpos($r[4],$yesterday)!==false||strpos($r[4],$yes2)!==false)) {
 					  $time = $r[4];
 					  if(validateDate($time)){
-						// $instructor = $r[3];
 						if (trim($r[7]) == 'na') {
 						  $r[7] = $r[6];
 						}
@@ -146,69 +158,69 @@ function summaryWriter($start=null,$end=null){
 						}
 						if ($website == 'barrysbootcamp') {
 						  if(!empty($r[12])){
+							$class_id = strtotime($r[12]); 
+						  } else {
+							$class_id = strtotime($r[4]);
+						  }
+						  if(!empty($class_id)&&$class_id!==null){
 							if (trim($r[10]) == 'na') {
 							  $r[10] = $r[9];
 							}
 							if (trim($r[11]) == 'na') {
 							  $r[11] = 0;
 							}
-							$class_id = trim($r[12]);
 							$spots = (int)$r[6]+(int)$r[9];
 							$enrolled = (int)$r[7]+(int)$r[10];
-							$open = (int)$r[8]+(int)$r[11];
+							//$open = (int)$r[8]+(int)$r[11];
+							$open = $spots-$enrolled;
+							if($open<0){
+								$enrolled = $spots;
+								$open = 0;
+							}
 							if(!empty($r[13])){
 							  $true = $r[13];
 							}
-						  } else {
-							$class_id = null;
 						  }
 						} else {
 						  $class_id = trim($r[9]);
 						  $spots = (int)$r[6];
 						  $enrolled = (int)$r[7];
 						  $open = (int)$r[8];
+						  $open = $spots-$enrolled;
 						  if(!empty($r[10])){
 							$true = $r[10];
 						  }
 						}
-
 						if ($spots == $enrolled) {
 						  $full = 1;
 						}
-
-						// If last class.
-						// Date;Website;Location ID;Location Name;Class Name;Instructor;Datetime;Spots;Enrolled Spots;Open Spots;City;State;Zipcode
 						if($class_id != null && $title == $r[2]){
-						  $flag = TRUE;
-					$class_data = [
-					'date'=>trim($yesterday),
-					'website'=>trim($website),
-					'locationID'=>trim($locationID),
-					'locationName'=>trim($title),
-							'name'=>$r[1],
-					'instructor'=>trim($r[3]),
-					'datetime'=>trim($r[4]),
-							'spots'=>$spots,
-							'enrolled'=>$enrolled,
-							'open'=>$open,
-							'true'=>trim($true),
-							'full'=>$full,
+							$flag = TRUE;
+							$class_data = [
+								'date'=>trim($yesterday),
+								'website'=>trim($website),
+								'locationID'=>trim($locationID),
+								'locationName'=>trim($title),
+								'name'=>$r[1],
+								'instructor'=>trim($r[3]),
+								'datetime'=>trim($r[4]),
+								'spots'=>$spots,
+								'enrolled'=>$enrolled,
+								'open'=>$open,
+								'true'=>trim($true),
+								'full'=>$full,
 						  ];
 						  $classes[$class_id][] = $class_data;
 						}
 					  }
 					}
-				  }
-				  unset($rows);
-				  $tempClass = [];
-				  foreach ($classes as $k=>$class) {
+				}
+				$tempClass = [];
+				foreach ($classes as $k=>$class) {
 					$tempClass[$k]=reset($class);
-				  }
-				  $classes = $tempClass;
-				  // var_dump($tempClass);
-				  // die();
-				  if($flag == TRUE){
-
+				}
+				$classes = $tempClass;
+				if($flag == TRUE){
 					$num = count($classes);
 					$spots = array_column($classes, 'spots');
 					$spots = array_sum($spots);
@@ -247,29 +259,30 @@ function summaryWriter($start=null,$end=null){
 
 					// $headers = 'Date;Website;Location ID;Location Name;Number Classes;Number Spots;Enrolled Spots;Open Spots \n\r';
 					$csv_array = [
-					trim($yesterday),
-					trim($website),
-					$locationID,
-					trim($title),
-					(int)$num,
-					(int)$spots,
-					(int)$enrolled,
-					(int)$open,
-					(int)$fullCount,
-					$city,
-					$state,
-					$zipcode,
+						trim($yesterday),
+						trim($website),
+						$locationID,
+						trim($title),
+						(int)$num,
+						(int)$spots,
+						(int)$enrolled,
+						(int)$open,
+						(int)$fullCount,
+						$city,
+						$state,
+						$zipcode,
 					];
 					$string = implode(';',$csv_array);
 					// var_dump($string);
 
 					fwrite($file,$string."\r\n");
 				  }
-				}
-				$flag = FALSE;
-			  }
-			  fclose($file);
+			//}
 		}
+		$flag = FALSE;
+	}
+	print('Script Finished '.$dir.$log."\r\n");
+	fclose($file);
 }
 
 function validateDate($date) {
@@ -282,5 +295,4 @@ function validateDate($date) {
   }
   return false;
 }
-
 ?>

@@ -70,14 +70,41 @@ casper.waitForSelector('form.well', function() {
 });
 
 casper.then(function(){
-	casper.thenOpen(bookerUrl, function(){
-		// If we're prompted by the point of sale form, which occurs on redirect to URL https://rumble.zingfitstudio.com/index.cfm?action=Register.chooseSite, then we have to fill out the form... we're gonna try bypassing it entirely
-		this.waitForUrl(bookerUrl);
-	});
+	var ur = this.getCurrentUrl();
+	if(ur.indexOf('chooseSite')>=0){
+				this.echo('url redirected');
+				this.waitForSelector('form[name="siteform"]',function(){
+					this.then(function(){
+						this.click('input[value="12900000001"]');
+					});
+					this.then(function(){
+						this.click('button[type="submit"]');
+					});
+				});
+	}
+});
 
-	casper.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard', function(){
-		this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
+casper.then(function(){
+	casper.thenOpen(bookerUrl, function(){
+		this.once('url.changed',function(url) {
+			this.echo('url changed');
+			var ur = this.getCurrentUrl();
+			if(ur.indexOf('chooseSite')>=0){
+				this.echo('url redirected');
+				this.waitForSelector('form[name="siteform"]',function(){
+					this.then(function(){
+						this.click('input[value="12900000001"]');
+					});
+					this.then(function(){
+						this.click('button[type="submit"]');
+					});
+				});
+			}
+		});
 	});
+	this.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard', function(){
+		this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
+	})
 });
 
 casper.then(function(){	
@@ -86,7 +113,8 @@ casper.then(function(){
 		var reportpage = salesreport+'&go=GO';
 		var reportexport = salesreport+'&export=csv';
 		if(currentDate <= 2){
-			casper.thenOpen(reportpage, function(){
+			casper.thenOpen(reportpage, function(){});
+			casper.then(function(){
 				casper.download(reportexport,logs+"sales/sales_"+lastMonth+"-"+currentYear+".csv");
 			});
 		}
@@ -94,7 +122,8 @@ casper.then(function(){
 		var salesreport2 = salesReportURL+'&start='+currentMonth+'%2F1%2F'+currentYear+'&end='+currentMonth+'%2F'+eom+'%2F'+currentYear;
 		var reportpage2 = salesreport2+'&go=GO';
 		var reportexport2 = salesreport2+'&export=csv';
-		casper.thenOpen(reportpage2, function(){
+		casper.thenOpen(reportpage2, function(){});
+		casper.then(function(){
 			casper.download(reportexport2,logs+"sales/sales_"+currentMonth+"-"+currentYear+".csv");
 		});
 });

@@ -46,7 +46,7 @@ var reOpenClass = true;
 var adminer = 'https://rumble.zingfitstudio.com/';
 var adminUrl = adminer;
 var reportURL = adminer+'index.cfm?action=Report.';
-
+var bookerUrl = 'https://rumble.zingfitstudio.com/index.cfm?action=Booker.view';
 var file = 'zingfit_report_download.log';
 var logs = '/var/www/html2/rumble-scripts/zflogs/';
 var currentDate = new Date().getDate().toString();								// Gets full date
@@ -98,14 +98,41 @@ casper.waitForSelector('form.well', function() {
   }, true);
 });
 
+/*
+6-1-2018
 /*casper.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Booker.view', function(){
-	// If we're prompted by the point of sale form, which occurs on redirect to URL https://rumble.zingfitstudio.com/index.cfm?action=Register.chooseSite, then we have to fill out the form... we're gonna try bypassing it entirely
 	this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Booker.view');
 });*/
 
 /*casper.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard', function(){
 	this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
 });*/
+casper.then(function(){
+	casper.thenOpen(bookerUrl, function(){
+		this.once('url.changed',function(url) {
+			this.echo('url changed');
+			if(this.getCurrentUrl().indexOf('chooseSite')>=0){
+				this.echo('url redirected');
+				this.waitForSelector('form.[name="siteform"]',function(){
+					this.click('input[value="12900000001"]',function(){
+								this.echo('filled form');
+								this.click('button[type="submit"]');
+						});
+				});
+				this.thenOpen(bookerUrl, function(){
+					this.echo('waiting for booker');
+					this.waitForUrl(bookerUrl);
+				});
+			} else {
+				//this.echo(this.getCurrentUrl());
+				//this.waitForUrl(bookerUrl);
+			}
+		});
+	});
+	this.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard', function(){
+		this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
+	});
+});
 
 casper.then(function(){
 	Object.keys(revenueReports).forEach(function(index){	
