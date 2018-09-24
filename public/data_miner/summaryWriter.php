@@ -3,16 +3,19 @@ print('Script Started'."\r\n");
 
 /*
 	Accepts argument of:
-		(1) Start date
-		(2) Optional end date (for a range)
+		(1) Start date M j, Y 
+		(2) Optional end date (for a range) M j, Y ... Jan 1, 2018
 		(3) No argument (today)
 */
+$start = null;
+$end = null;
+	
 if (defined('STDIN')) {
-  $start = $argv[1];
-  $end = $argv[2];
+	$start = isset($argv[1])? $argv[1] : null;
+	$end = isset($argv[2])? $argv[2] : null;
 } else {
-  $start = $_GET['start'];
-  $end = $_GET['end'];
+	$start = isset($_GET['start'])? $_GET['start'] : null;
+	$end = isset($_GET['end'])? $_GET['end'] : null;
 }
 
 summaryWriter($start,$end);
@@ -26,10 +29,18 @@ function getTitle($rows){
 	  $lastRow = end($rows);
 	  $randomRow = $rows[rand(0,$count-1)];
 	  $nameArray = [];
-	  $nameArray[] = rowIntoArray($firstRow)[2];
-	  $nameArray[] = rowIntoArray($middleRow)[2];
-	  $nameArray[] = rowIntoArray($lastRow)[2];
-	  $nameArray[] = rowIntoArray($randomRow)[2];
+	  if(isset(rowIntoArray($firstRow)[2])){
+		  $nameArray[] = rowIntoArray($firstRow)[2];
+	  }
+	  if(isset(rowIntoArray($middleRow)[2])){
+		  $nameArray[] = rowIntoArray($middleRow)[2];
+	  }
+	  if(isset(rowIntoArray($lastRow)[2])){
+		  $nameArray[] = rowIntoArray($lastRow)[2];
+	  }
+	  if(isset(rowIntoArray($randomRow)[2])){
+		  $nameArray[] = rowIntoArray($randomRow)[2];
+	  }
 	  $c = array_count_values($nameArray);
 	  $name = array_search(max($c), $c);
 	  return $name;
@@ -66,7 +77,7 @@ function summaryWriter($start=null,$end=null){
     $studiotemp[$site][$studio->studio_id] = $studio;
   }
   $studios = $studiotemp;
-
+  
   $dir = '/var/www/html2/rumble-scripts/public/data_miner/log/';
   $flag = false;
   $title = '';
@@ -75,7 +86,7 @@ function summaryWriter($start=null,$end=null){
   if(!isset($start)){
 	$yesterday = date("M j, Y ", time() - 60 * 60 * 24);
   } else {
-	$yesterday = date("M j, Y ", strtotime($start));
+	$yesterday = date("M j, Y", strtotime($start));
   }
   $classes = [];
 
@@ -103,8 +114,8 @@ function summaryWriter($start=null,$end=null){
 		for($i=0; $i<=$num_days; $i++){
 			// In the first iteration, $yesterday = $start, so we want to add (i) # days to $start
 			$add = $i*(60 * 60 * 24);
-			$today = date("M j, Y ", strtotime($yesterday)+$add);
-			$dd = date("M j, Y ", strtotime($today));
+			$today = date("M j, Y", strtotime($yesterday)+$add);
+			$dd = date("M j, Y", strtotime($today));
 			$dates[] = $dd;
 		}
 	} else {
@@ -121,7 +132,7 @@ function summaryWriter($start=null,$end=null){
 		if(strpos($name, 'scraper_day') !== false){
 			// find all data for yesterday.  we reverse the array for faster execution
 			$contents = null;
-			if(($contents = file($dir.$log))===FALSE){
+			if(($contents = file($dir.$log))===FALSE||empty($contents)){
 				continue;
 			}			
 			//foreach($dates as $yesterday){

@@ -16,7 +16,7 @@ var casper = require('casper').create({
 // var path = fs.absolute('');
 var path = casper.cli.get('path');
 if (typeof path === 'undefined' ) {
-  path = "/var/www/html2/rumble-scripts/booker_looper/script";
+  path = "/var/www/html/rumble-scripts/booker_looper/script";
 }
 casper.options.clientScripts = [
   /*path+"/moment.min.js",
@@ -38,7 +38,6 @@ casper.on("page.error", function(msg, trace) {
 // var username = 'admin';
 // var password = 'password';
 // var reOpenClass = false;
-var url = 'https://rumble.zingfitstudio.com/';
 var username = 'mike.ricotta';
 var password = 'M1Rumbl3!KE';
 var reOpenClass = true;
@@ -58,8 +57,8 @@ var currentYearFull = new Date().getFullYear().toString();			// Gets full year
 var currentYear = currentYearFull.substr(-2);						// Gets 2 digit year
 var eom = new Date(currentYearFull, currentMonth, 0).toString().substr(8,2);	// end of this month
 var eolm = new Date(currentYearFull, lastMonth, 0).toString().substr(8,2);		// end of last month
+var regions = ['12900000002','12900000004'];
 var bookerUrl = 'https://rumble.zingfitstudio.com/index.cfm?action=Booker.view';
-	
 var months = ['1','2','3','4','5','6','7','8','9','10','11','12'];
 
 casper.start(adminUrl, function(){
@@ -73,111 +72,125 @@ casper.waitForSelector('form.well', function() {
   }, true);
 });
 
-/*
-6-1-2018
-/*casper.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Booker.view', function(){
-	// If we're prompted by the point of sale form, which occurs on redirect to URL https://rumble.zingfitstudio.com/index.cfm?action=Register.chooseSite, then we have to fill out the form... we're gonna try bypassing it entirely
-	this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Booker.view');
-});*/
+casper.then(function(){
+	var ur = this.getCurrentUrl();
+	if(ur.indexOf('chooseSite')>=0){
+				this.echo('url redirected');
+				this.waitForSelector('form[name="siteform"]',function(){
+					this.then(function(){
+						this.click('input[value="12900000001"]');
+					});
+					this.then(function(){
+						this.click('button[type="submit"]');
+					});
+				});
+	}
+});
 
-/*casper.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard', function(){
-	this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
-});*/
-// This runs a loop of all months of ER Expired Series (First Time)
 casper.then(function(){
 	casper.thenOpen(bookerUrl, function(){
 		this.once('url.changed',function(url) {
 			this.echo('url changed');
-			if(this.getCurrentUrl().indexOf('chooseSite')>=0){
+			var ur = this.getCurrentUrl();
+			if(ur.indexOf('chooseSite')>=0){
 				this.echo('url redirected');
-				this.waitForSelector('form.[name="siteform"]',function(){
-					this.click('input[value="12900000001"]',function(){
-								this.echo('filled form');
-								this.click('button[type="submit"]');
-						});
+				this.waitForSelector('form[name="siteform"]',function(){
+					this.then(function(){
+						this.click('input[value="12900000001"]');
+					});
+					this.then(function(){
+						this.click('button[type="submit"]');
+					});
 				});
-				this.thenOpen(bookerUrl, function(){
-					this.echo('waiting for booker');
-					this.waitForUrl(bookerUrl);
-				});
-			} else {
-				//this.echo(this.getCurrentUrl());
-				//this.waitForUrl(bookerUrl);
 			}
 		});
 	});
-	this.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard', function(){
-		this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
+	this.thenOpen(bookerUrl, function(){
+		this.waitForUrl(bookerUrl);
 	});
 });
 
-
 casper.then(function(){
-	var index = 'FirstTime';
-	var identifier = '12900000006';
-	var filename = logs+'revenue/RevenueReport_'+index+'_'+identifier+'.csv';
-	var string = '';
-	var header_string = '';
-	fs.write(filename, string, 'w');
-	for(var i = 5, len = months.length; i < len; i++){
-		var eotm = new Date(currentYearFull, months[i], 0).toString().substr(8,2);	// end of this month
-		var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+identifier+'&start='+months[i]+'%2F1%2F'+currentYear+'&end='+months[i]+'%2F'+eotm+'%2F'+currentYear;
-		casper.thenOpen(revenueURL, function(){
-			if(header_string.length == 0){
-				this.waitForSelector('table.table-bordered thead', function() {
-					var headers = casper.evaluate(function() {
-						return document.querySelector('table.table-bordered thead');
-					});
-					this.wait(4000,function(){
-						if (typeof headers !== 'undefined') {
-							var hdr = casper.evaluate(function(cssSelector){
-								var st = '';
-								__utils__.findAll(cssSelector).forEach(function(el){
-									st += '"'+el.textContent.trim()+'",';
-									console.log('header: '+st);
+	/*casper.each(regions, function(self, rgn){
+		var setRegion = adminer+'index.cfm?action=Register.setSite&siteid='+rgn+'&returnurl=%2Findex%2Ecfm%3Faction%3DReport%2Edashboard';
+		casper.thenOpen(setRegion, function(){
+			this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');		
+		});
+		casper.then(function(){
+			if(rgn == '12900000002') { 
+				var loc = 'NY';
+			} else if(rgn == '12900000004') { 
+				var loc = 'LA';
+			} else { 
+				var loc = 'NY';
+			}*/
+			var index = 'FirstTime';
+			var identifier = '12900000006';
+			var filename = logs+'revenue/RevenueReport_'+index+'_'+identifier+'.csv';
+			var string = '';
+			var header_string = '';
+			fs.write(filename, string, 'w');
+			for(var i = 5, len = months.length; i < len; i++){
+				var eotm = new Date(currentYearFull, months[i], 0).toString().substr(8,2);	// end of this month
+				var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+identifier+'&start='+months[i]+'%2F1%2F'+currentYear+'&end='+months[i]+'%2F'+eotm+'%2F'+currentYear;
+				casper.thenOpen(revenueURL, function(){
+					if(header_string.length == 0){
+						this.waitForSelector('table.table-bordered thead', function() {
+							var headers = casper.evaluate(function() {
+								return document.querySelector('table.table-bordered thead');
+							});
+							this.wait(4000,function(){
+								if (typeof headers !== 'undefined') {
+									var hdr = casper.evaluate(function(cssSelector){
+										var st = '';
+										__utils__.findAll(cssSelector).forEach(function(el){
+											st += '"'+el.textContent.trim()+'",';
+											console.log('header: '+st);
+										});
+										return st;
+									}, 'table.table-bordered thead tr:nth-child(2) th');
+									header_string = hdr+'\r\n';
+								} else {
+									console.log('table undefined');
+								}
+							});
+						});
+					}
+					var string = '';
+					this.waitForSelector('table.table-bordered tbody', function() {
+						var table = casper.evaluate(function() {
+							return document.querySelector('table.table-bordered tbody');
+						});
+						this.wait(4000,function(){
+							if (typeof table !== 'undefined') {
+								var tr = this.evaluate(function() {
+									return document.querySelectorAll('table.table-bordered tbody tr').length;
 								});
-								return st;
-							}, 'table.table-bordered thead tr:nth-child(2) th');
-							header_string = hdr+'\r\n';
-						} else {
-							console.log('table undefined');
-						}
+								//console.log('tr length '+tr);
+								var i = 0;
+								var j = 0;
+								for (i = 0; i < tr; ++i) {
+									var cell = casper.evaluate(function(cssSelector){
+										var str = '';
+										__utils__.findAll(cssSelector).forEach(function(el){
+											str += '"'+el.textContent.trim()+'",';
+										});
+										return str;
+									}, 'table.table-bordered tbody tr:nth-child('+i+') td');
+									//console.log(cell);
+									string += cell+'\r\n';
+								};
+								string = header_string+string;
+								fs.write(filename, string, 'a');
+							} else {
+								console.log('table undefined');
+							}
+						});
 					});
 				});
 			}
-			var string = '';
-			this.waitForSelector('table.table-bordered tbody', function() {
-				var table = casper.evaluate(function() {
-					return document.querySelector('table.table-bordered tbody');
-				});
-				this.wait(4000,function(){
-					if (typeof table !== 'undefined') {
-						var tr = this.evaluate(function() {
-							return document.querySelectorAll('table.table-bordered tbody tr').length;
-						});
-						//console.log('tr length '+tr);
-						var i = 0;
-						var j = 0;
-						for (i = 0; i < tr; ++i) {
-							var cell = casper.evaluate(function(cssSelector){
-								var str = '';
-								__utils__.findAll(cssSelector).forEach(function(el){
-									str += '"'+el.textContent.trim()+'",';
-								});
-								return str;
-							}, 'table.table-bordered tbody tr:nth-child('+i+') td');
-							//console.log(cell);
-							string += cell+'\r\n';
-						};
-						string = header_string+string;
-						fs.write(filename, string, 'a');
-					} else {
-						console.log('table undefined');
-					}
-				});
-			});
-		});
-	}
+		/*});
+	});*/
 });
 
 casper.run(function(){

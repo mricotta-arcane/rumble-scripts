@@ -16,7 +16,7 @@ var casper = require('casper').create({
 // var path = fs.absolute('');
 var path = casper.cli.get('path');
 if (typeof path === 'undefined' ) {
-  path = "/var/www/html2/rumble-scripts/booker_looper/script";
+  path = "/var/www/html/rumble-scripts/booker_looper/script";
 }
 casper.options.clientScripts = [
  /* path+"/moment.min.js",
@@ -34,16 +34,14 @@ casper.on("page.error", function(msg, trace) {
   // this.echo("Page Error: " + msg, "ERROR");
 });
 
-var url = 'https://rumble.zingfitstudio.com/';
-var username = 'mricotta';
-var password = 'Rumbl3123!';
+var username = 'mike.ricotta';
+var password = 'M1Rumbl3!KE';
 
 var adminer = 'https://rumble.zingfitstudio.com/';
 var adminUrl = adminer;
 var reportURL = adminer+'index.cfm?action=Report.';
 var attendanceReportURL = reportURL+'attendanceExport&roomid=';		// This accepts 2 variables, the first is the roomid and the second is a period of time
 var salesReportURL = reportURL+'allSalesByDate';					// This accepts 1 variables, the date range
-var attendanceReports = {FlatironChelsea:'12900000001',Private:'12900000002',NoHo:'12900000003'};	// These are the 3 different types of reports that we'll loop through
 
 var file = 'zingfit_report_download.log';
 var logs = '/var/www/html2/rumble-scripts/zflogs/';
@@ -57,6 +55,7 @@ var currentYear = currentYearFull.substr(-2);						// Gets 2 digit year
 var eom = new Date(currentYearFull, currentMonth, 0).toString().substr(8,2);	// end of this month
 var eolm = new Date(currentYearFull, lastMonth, 0).toString().substr(8,2);		// end of last month
 var bookerUrl = 'https://rumble.zingfitstudio.com/index.cfm?action=Booker.view';
+var regions = ['12900000002','12900000004'];
 
 casper.start(adminUrl, function(){
   // this.echo("page loaded");
@@ -102,30 +101,43 @@ casper.then(function(){
 			}
 		});
 	});
-	this.thenOpen('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard', function(){
-		this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
-	})
+	this.thenOpen(bookerUrl, function(){
+		this.waitForUrl(bookerUrl);
+	});
 });
 
-casper.then(function(){	
-		// REFACTOR: For January months, we'll have to deduct current Year by 1.
-		var salesreport = salesReportURL+'&start='+lastMonth+'%2F1%2F'+currentYear+'&end='+lastMonth+'%2F'+eolm+'%2F'+currentYear;
-		var reportpage = salesreport+'&go=GO';
-		var reportexport = salesreport+'&export=csv';
-		if(currentDate <= 2){
-			casper.thenOpen(reportpage, function(){});
-			casper.then(function(){
-				casper.download(reportexport,logs+"sales/sales_"+lastMonth+"-"+currentYear+".csv");
-			});
-		}
-		// This is the sales report which runs one month at a time but runs for the whole month, which is fine.  We need to know exact end of month day (ie. 28th, 30th, 31st) or it won't run
-		var salesreport2 = salesReportURL+'&start='+currentMonth+'%2F1%2F'+currentYear+'&end='+currentMonth+'%2F'+eom+'%2F'+currentYear;
-		var reportpage2 = salesreport2+'&go=GO';
-		var reportexport2 = salesreport2+'&export=csv';
-		casper.thenOpen(reportpage2, function(){});
-		casper.then(function(){
-			casper.download(reportexport2,logs+"sales/sales_"+currentMonth+"-"+currentYear+".csv");
+casper.then(function(){
+	casper.each(regions, function(self, rgn){
+		var setRegion = adminer+'index.cfm?action=Register.setSite&siteid='+rgn+'&returnurl=%2Findex%2Ecfm%3Faction%3DReport%2Edashboard';
+		casper.thenOpen(setRegion, function(){
+			this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');		
 		});
+		casper.then(function(){
+			if(rgn == '12900000002') { 
+				var loc = 'NY';
+			} else if(rgn == '12900000004') { 
+				var loc = 'LA';
+			} else { 
+				var loc = 'NY';
+			}
+			// REFACTOR: For January months, we'll have to deduct current Year by 1.
+			var salesreport = salesReportURL+'&start='+lastMonth+'%2F1%2F'+currentYear+'&end='+lastMonth+'%2F'+eolm+'%2F'+currentYear;
+			var reportpage = salesreport+'&go=GO';
+			var reportexport = salesreport+'&export=csv';
+			if(currentDate <= 2){
+				casper.thenOpen(reportpage, function(){
+					casper.download(reportexport,logs+"sales/sales_"+loc+"_"+lastMonth+"-"+currentYear+".csv");
+				});
+			}
+			// This is the sales report which runs one month at a time but runs for the whole month, which is fine.  We need to know exact end of month day (ie. 28th, 30th, 31st) or it won't run
+			var salesreport2 = salesReportURL+'&start='+currentMonth+'%2F1%2F'+currentYear+'&end='+currentMonth+'%2F'+eom+'%2F'+currentYear;
+			var reportpage2 = salesreport2+'&go=GO';
+			var reportexport2 = salesreport2+'&export=csv';
+			casper.thenOpen(reportpage2, function(){
+				casper.download(reportexport2,logs+"sales/sales_"+loc+"_"+currentMonth+"-"+currentYear+".csv");
+			});
+		});
+	});
 });
 
 casper.run(function(){
