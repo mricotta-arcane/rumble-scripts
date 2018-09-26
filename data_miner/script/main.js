@@ -232,7 +232,87 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 		});
       });
       break;
-  case 'barrysbootcamp':
+      case 'barrysbootcamp':
+        currentTime = moment().tz('America/New_York').format(timeformat);
+        this.then(function(){
+          classAll = this.evaluate(function(length){
+            var apiUrl = 'https://barrysbootcamp.marianatek.com/';
+            var classAll = [];
+            var locations = [];
+            var now = new Date();
+            var startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime() / 1000;
+            var tomorrow = new Date(new Date().getTime() + 24 * 60 * 60 * 1000).getTime() / 1000;
+            var week = new Date(new Date().getTime() + 24 * 60 * 60 * 1000 * 7).getTime() / 1000;
+            var todayString = now.getFullYear()+'-'+('0' + (now.getMonth()+1)).slice(-2)+'-'+('0' + now.getDate()).slice(-2);
+            console.log(length);
+            console.log(todayString);
+            jQuery.ajax({
+              async: false,
+              url: apiUrl+"api/locations?page_size=100"
+            }).done(function(d){
+              if(typeof d.data !=='undefined'){
+                locations = d.data;
+                jQuery.each(locations,function(i,location){
+                  console.log("Getting class for location: "+location.id);
+                  jQuery.ajax({
+                    async: false,
+                    url: apiUrl+"api/class_sessions",
+                    data: {
+                      include: "available_primary_spots,available_secondary_spots,class_session_type,standby_availability,in_booking_window",
+                      location: location.id,
+                      max_date: todayString,
+                      min_date: todayString,
+                      ordering : "start_datetime",
+                      page_size : 100,
+                    }
+                  }).done(function(dd){
+                    if(typeof dd.data !== 'undefined' ){
+                      classes = dd.data;
+                      jQuery.each(classes,function(i,c){
+                        console.log("Getting class: "+c.id);
+                        c.timezone = location.attributes.timezone;
+                        c.location_id = location.id;
+                        classAll.push(c);
+                      });
+                    };
+                  }).fail(function(jqXHR, textStatus) {
+                    console.log(jqXHR.status);
+                    console.log(textStatus);
+                  })
+                });
+              }
+            });
+            return classAll;
+          },{length:length});
+          this.then(function(){
+            this.eachThen(classAll,function(r){
+              c = r.data;
+              open = c.attributes.available_spots.length;
+              enrolled = c.attributes.capacity - open;
+              classDate = moment.tz(c.attributes.start_datetime,c.timezone);
+              var classCsvLineArray = [
+                currentTime,
+                c.attributes.class_type_display,
+                c.attributes.classroom_display,
+                c.attributes.instructor_names.join(", "),
+                classDate.format(timeformat),
+                c.attributes.duration,
+                c.attributes.capacity,
+                open,
+                enrolled,
+                0,
+                0,
+                0,
+                c.id
+              ];
+              classAll.push(classCsvLineArray);
+              writeFile(site,classCsvLineArray,c.location_id,c.timezone);
+            });
+          });
+        });
+
+        break;
+      case 'barrysbootcampOLD':
     username = 'james.k@leanfwk.com';
 	//username = 'jtyson@dadstie.com';
     password = 'Afkalh!34';
@@ -250,7 +330,7 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 					if(uri.indexOf('mtredirect')>=0){
 						this.echo('redirected us');
 						this.thenOpen(loginUrl, function(){
-							
+
 						});
 					}
 				});
@@ -282,7 +362,7 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 							});
 							this.then(function(){
 								this.wait(3000, function(){
-									
+
 								});
 							});
 							//this.click('#international_select option[value="https://www.barrysbootcamp.com/login/login"]');
@@ -356,8 +436,8 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 									this.wait(3500, function() {
 										var locId = this.evaluate(function(){
 												return jQuery('#mariana-schedule-week-routable-binding').attr('data-mariana-location-id');
-										});		  
-										classlist = this.evaluate(function(selector){	
+										});
+										classlist = this.evaluate(function(selector){
 																  var classlist=[];
 																if($(selector).length > 0){
 																	  $.each($(selector),function(i,v){
@@ -374,7 +454,7 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 																			var dater = month+day;
 																			var classDate = new Date().getFullYear()+'/'+dater;
 																			var classFull = true;
-																			
+
 																			if (sb.find('.MT_schedule__waitlist-button').length) {
 																				classFull = true;
 																			} else if(sb.find('.MT_schedule__register-button').length){
@@ -589,7 +669,7 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 																					];
 																writeFile(site,classCsvLineArray,classLocationId,barryClassTZ);
 															}
-														});										
+														});
 												});
 										} else {
 											this.echo('class list is empty');
@@ -1000,7 +1080,7 @@ var flyWheelgetLocation = function(studio_id){
 var writeHTML = function(buttonId,currentTime,html){
 	var filename = buttonId+currentTime;
 	if(typeof html === 'object'){
-		fs.write('/home/ubuntu/'+filename,'sorry this is an object', 'w');	
+		fs.write('/home/ubuntu/'+filename,'sorry this is an object', 'w');
 	} else {
 		fs.write('/home/ubuntu/'+filename,html, 'w');
 	}
