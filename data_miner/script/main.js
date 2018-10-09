@@ -843,9 +843,6 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 								'input#email-input': soulcycleEmail,
 								'input#password-input': soulcyclePassword
 							}, true);
-							this.then(function(){
-								this.click('button#handle-login');
-							})
 							this.then(function() {
 								console.log('clicked ok, new location is ' + this.getCurrentUrl());
 							});
