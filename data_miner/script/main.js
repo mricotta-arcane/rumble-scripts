@@ -833,10 +833,11 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 				classesUrl = 'https://www.soul-cycle.com/find-a-class/studio/';
 				classUrl = 'https://www.soul-cycle.com/find-a-class/select-bike/';
 				soulCycleMainUrl = 'https://www.soul-cycle.com/';
+				soulCycleSignInUrl = 'https://www.soul-cycle.com/signin/';
 				soulcycleEmail = 'sor.net@gmail.com';
 				soulcyclePassword = 'qwe123asd';
 				// Login first
-				this.thenOpen(classesUrl, function() {
+				this.thenOpen(soulCycleSignInUrl, function() {
 					this.waitForSelector('form.form-sign-in', function() {
 						this.fillSelectors('form.form-sign-in', {
 							'input[name="email"]': soulcycleEmail,
