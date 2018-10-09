@@ -120,7 +120,7 @@ if (forceHourCheck === true) {
     'soulcycle':60
   };
 }
-if (site == 'flywheel' || 'barrysbootcamp'){
+if (site == 'flywheel' || site == 'barrysbootcamp'){
   casper.options.clientScripts = [
     path+"lib/jquery-3.2.1.min.js"
   ];
@@ -830,24 +830,27 @@ casper.start('https://www.barrysbootcamp.com/',function() {
       });
       break;
     case 'soulcycle':
-				classesUrl = 'https://www.soul-cycle.com/find-a-class/studio/';
-				classUrl = 'https://www.soul-cycle.com/find-a-class/select-bike/';
-				soulCycleMainUrl = 'https://www.soul-cycle.com/';
-				soulCycleSignInUrl = 'https://www.soul-cycle.com/signin/';
-				soulcycleEmail = 'sor.net@gmail.com';
-				soulcyclePassword = 'qwe123asd';
-				// Login first
-				this.thenOpen(soulCycleSignInUrl, function() {
-					this.waitForSelector('form.form-sign-in', function() {
-						this.fillSelectors('form.form-sign-in', {
-							'input[name="email"]': soulcycleEmail,
-							'input[name="password"]': soulcyclePassword
-						}, true);
-						this.waitForUrl(soulCycleMainUrl, function() {
-							this.echo('Logged into soulcycle');
+					classesUrl = 'https://www.soul-cycle.com/find-a-class/studio/';
+					classUrl = 'https://www.soul-cycle.com/find-a-class/select-bike/';
+					soulCycleMainUrl = 'https://www.soul-cycle.com/';
+					soulCycleSignInUrl = 'https://www.soul-cycle.com/signin/';
+					soulcycleEmail = 'sor.net@gmail.com';
+					soulcyclePassword = 'qwe123asd';
+					// Login first
+					this.thenOpen(soulCycleSignInUrl, function() {
+						this.waitForSelector('form.form-sign-in', function() {
+							this.fillSelectors('form.form-sign-in', {
+								'input[name="email"]': soulcycleEmail,
+								'input[name="password"]': soulcyclePassword
+							}, false);
+							this.then(function(){
+								this.click('button#handle-login');
+							})
+							this.waitForUrl(soulCycleMainUrl, function() {
+								this.echo('Logged into soulcycle');
+							});
 						});
 					});
-				});
 
 
       this.eachThen(locations.all.SoulCycle, function(r){
