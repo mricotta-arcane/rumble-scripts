@@ -57,7 +57,6 @@ function summaryWriter($start=null,$end=null){
   $studios->setFetchMode(PDO::FETCH_OBJ);
 
   $studiotemp = [];
-
   foreach ($studios as $studio) {
     switch ($studio->site) {
       case 'Barrys':
@@ -77,7 +76,6 @@ function summaryWriter($start=null,$end=null){
     $studiotemp[$site][$studio->studio_id] = $studio;
   }
   $studios = $studiotemp;
-  
   $dir = '/var/www/html2/rumble-scripts/public/data_miner/log/';
   $flag = false;
   $title = '';
@@ -121,7 +119,6 @@ function summaryWriter($start=null,$end=null){
 	} else {
 		$dates[] = $yesterday;
 	}
-
 	foreach($logs as $log){
 		if($log=='.'||$log=='..'){
 			continue;
@@ -169,7 +166,8 @@ function summaryWriter($start=null,$end=null){
 						}
 						if ($website == 'barrysbootcamp') {
 						  if(!empty($r[12])){
-							$class_id = strtotime($r[12]); 
+							//$class_id = strtotime($r[12]); 
+							$class_id = $r[12];
 						  } else {
 							$class_id = strtotime($r[4]);
 						  }
@@ -258,7 +256,6 @@ function summaryWriter($start=null,$end=null){
 						$zipcode = $studio->zipcode;
 					  }
 					}
-
 					foreach($classes as $class){
 						unset($class['true']);
 						unset($class['full']);
@@ -285,7 +282,6 @@ function summaryWriter($start=null,$end=null){
 					];
 					$string = implode(';',$csv_array);
 					// var_dump($string);
-
 					fwrite($file,$string."\r\n");
 				  }
 			//}
