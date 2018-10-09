@@ -838,34 +838,36 @@ casper.start('https://www.barrysbootcamp.com/',function() {
 					soulcyclePassword = 'qwe123asd';
 					// Login first
 					this.thenOpen(soulCycleSignInUrl, function() {
-						this.waitForSelector('form.form-sign-in', function() {
-							this.fillSelectors('form.form-sign-in', {
-								'input[name="email"]': soulcycleEmail,
-								'input[name="password"]': soulcyclePassword
-							}, false);
+						this.waitForSelector('form.login__form', function() {
+							this.fillSelectors('form.login__form', {
+								'input#email-input': soulcycleEmail,
+								'input#password-input': soulcyclePassword
+							}, true);
 							this.then(function(){
 								this.click('button#handle-login');
 							})
+							this.then(function() {
+								console.log('clicked ok, new location is ' + this.getCurrentUrl());
+							});
 							this.waitForUrl(soulCycleMainUrl, function() {
 								this.echo('Logged into soulcycle');
 							});
 						});
 					});
 
-
-      this.eachThen(locations.all.SoulCycle, function(r){
-        classLocationId = r.data.studio_id;
-        var soulcycleClassTZ = r.data.timezone;
-        classAll = [];
-        classSeats = r.data.seat;
-        this.thenOpen(classesUrl+classLocationId,function(){
-			this.then(function(){
-				this.evaluate(function(){
-					if($('.button-cancel').length){
-						this.click('.button-cancel');
-					}
-				});
-			});
+					this.eachThen(locations.all.SoulCycle, function(r){
+						classLocationId = r.data.studio_id;
+						var soulcycleClassTZ = r.data.timezone;
+						classAll = [];
+						classSeats = r.data.seat;
+						this.thenOpen(classesUrl+classLocationId,function(){
+							this.then(function(){
+								this.evaluate(function(){
+									if($('.button-cancel').length){
+										this.click('.button-cancel');
+									}
+								});
+							});
           classLocationTitle = this.getHTML('h3.studio-title').trim();
           // Set selector based on datalength
           selector = '.today .session:not(.expired):not(.no-sessions):not(.supersoul)';
