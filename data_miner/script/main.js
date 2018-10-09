@@ -830,8 +830,25 @@ casper.start('https://www.barrysbootcamp.com/',function() {
       });
       break;
     case 'soulcycle':
-      classesUrl = 'https://www.soul-cycle.com/find-a-class/studio/';
-      classUrl = 'https://www.soul-cycle.com/find-a-class/select-bike/';
+				classesUrl = 'https://www.soul-cycle.com/find-a-class/studio/';
+				classUrl = 'https://www.soul-cycle.com/find-a-class/select-bike/';
+				soulCycleMainUrl = 'https://www.soul-cycle.com/';
+				soulcycleEmail = 'sor.net@gmail.com';
+				soulcyclePassword = 'qwe123asd';
+				// Login first
+				this.thenOpen(classesUrl, function() {
+					this.waitForSelector('form.form-sign-in', function() {
+						this.fillSelectors('form.form-sign-in', {
+							'input[name="email"]': soulcycleEmail,
+							'input[name="password"]': soulcyclePassword
+						}, true);
+						this.waitForUrl(soulCycleMainUrl, function() {
+							this.echo('Logged into soulcycle');
+						});
+					});
+				});
+
+
       this.eachThen(locations.all.SoulCycle, function(r){
         classLocationId = r.data.studio_id;
         var soulcycleClassTZ = r.data.timezone;
