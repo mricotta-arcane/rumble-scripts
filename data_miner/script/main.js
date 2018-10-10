@@ -923,6 +923,8 @@ casper.start('https://www.barrysbootcamp.com/',function() {
                   if(classNow < classDate ){
                     writeLog = true;
                   }
+
+																		// If some classes are full it's not possible to click so we have to have default class seats
                   if(classLocationId == 3){
                     if (co.classRoom == '(A)') {
                       classSeats = 71;
@@ -940,11 +942,26 @@ casper.start('https://www.barrysbootcamp.com/',function() {
                     }
                   }
 
+																		// if we can't open class then it must be full, full classes redirects back to studio page
                   classAvailableSeats = 0;
                   classEnrolledSeats = classSeats;
+
+																		// co.classId = 1031477
+
                   if(co.classFull !== true && writeLog === true){
                     this.thenOpen(classUrl+co.classId,function(){
                       this.waitForSelector('.seats',function(){
+
+																							// Get class seats
+																							var classSeatsTemp = this.evaluate(function(){
+																								return jQuery('.seats .seat:not(.fan, .instructor)').length;
+																							});
+
+																							// Check if class seats loading
+																							if(classSeatsTemp>0){
+																								classSeats = classSeatsTemp;
+																							}
+
                         this.wait(1000, function() {
                           classAvailableSeats = this.evaluate(function(){
                             return jQuery('.seats .seat:not(.fan):not(.instructor):not(.taken)').length;
@@ -953,7 +970,7 @@ casper.start('https://www.barrysbootcamp.com/',function() {
                         });
                       },function(){
                         this.echo("opening class failed");
-                      });
+                      },3000);
                     });
                   }
                   if(writeLog === true){
