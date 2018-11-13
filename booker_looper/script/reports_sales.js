@@ -55,7 +55,7 @@ var currentYear = currentYearFull.substr(-2);						// Gets 2 digit year
 var eom = new Date(currentYearFull, currentMonth, 0).toString().substr(8,2);	// end of this month
 var eolm = new Date(currentYearFull, lastMonth, 0).toString().substr(8,2);		// end of last month
 var bookerUrl = 'https://rumble.zingfitstudio.com/index.cfm?action=Booker.view';
-var regions = ['12900000002','12900000004'];
+var regions = ['12900000002','12900000004','751454502594283131'];
 
 casper.start(adminUrl, function(){
   // this.echo("page loaded");
@@ -117,6 +117,8 @@ casper.then(function(){
 				var loc = 'NY';
 			} else if(rgn == '12900000004') { 
 				var loc = 'LA';
+			} else if(rgn == '751454502594283131'){
+				var loc = 'SF';
 			} else { 
 				var loc = 'NY';
 			}

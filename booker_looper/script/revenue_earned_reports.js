@@ -57,7 +57,7 @@ var currentYearFull = new Date().getFullYear().toString();			// Gets full year
 var currentYear = currentYearFull.substr(-2);						// Gets 2 digit year
 var eom = new Date(currentYearFull, currentMonth, 0).toString().substr(8,2);	// end of this month
 var eolm = new Date(currentYearFull, lastMonth, 0).toString().substr(8,2);		// end of last month
-var regions = ['12900000002','12900000004'];
+var regions = ['12900000002','12900000004','751454502594283131'];
 var bookerUrl = 'https://rumble.zingfitstudio.com/index.cfm?action=Booker.view';
 var months = ['1','2','3','4','5','6','7','8','9','10','11','12'];
 
