@@ -140,7 +140,7 @@ casper.start('https://www.barrysbootcamp.com/',function() {
             'input[name="password"]' : password
           }, false);
           this.then(function(){
-            this.click('.login__button');
+            this.click('.login form button');
           });
         },function() {
           console.log("Can't Login");
