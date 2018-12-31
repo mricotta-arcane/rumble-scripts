@@ -130,7 +130,7 @@ casper.then(function(){
 			var string = '';
 			var header_string = '';
 			fs.write(filename, string, 'w');
-			for(var i = 5, len = months.length; i < len; i++){
+			for(var i = 0, len = months.length; i < len; i++){
 				var eotm = new Date(currentYearFull, months[i], 0).toString().substr(8,2);	// end of this month
 				var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+identifier+'&start='+months[i]+'%2F1%2F'+currentYear+'&end='+months[i]+'%2F'+eotm+'%2F'+currentYear;
 				casper.thenOpen(revenueURL, function(){

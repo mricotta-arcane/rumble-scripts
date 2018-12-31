@@ -121,7 +121,13 @@ casper.then(function(){
 			
 		});
 		casper.then(function(){
-			var reportpage = attendanceReportURL+identifier+'&start=7%2F1%2F'+currentYear+'&end=12%2F31%2F'+currentYear+'&export=csv';
+                        var startdate = '1%2F1%2F';
+                        var enddate = '6%2F30%2F';
+                        if(currentMonth>6){
+                                var startdate = '7%2F1%2F';
+                                var enddate = '12%2F31%2F';
+                        }
+			var reportpage = attendanceReportURL+identifier+'&start='+startdate+currentYear+'&end='+enddate+currentYear+'&export=csv';
 			var reporttoday = attendanceReportURL+identifier+'&start='+currentMonth+'%2F'+currentDate+'%2F'+currentYear+'&end='+currentMonth+'%2F'+currentDate+'%2F'+currentYear+'&export=csv';
 			//casper.download(reportpage,logs+"attendance/attendance_"+index+"_"+currentMonth+"-"+currentYear+".csv");
 			// Get full year data
