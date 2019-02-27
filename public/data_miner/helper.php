@@ -97,14 +97,22 @@ function checkById($id,$conn)
   }
   return false;
 }
+
+function createSlug($string){
+  $slug=preg_replace('/[^A-Za-z0-9-]+/', '-', $string);
+  return strtolower($slug);
+}
+
 function getUrl($studio){
   switch ($studio->site) {
     case 'Barrys':
-      $url = 'https://booking.barrysbootcamp.com/reserve/index.cfm?action=Reserve.chooseClass&site='.$studio->studio_id;
+      $url = 'https://www.barrysbootcamp.com/schedule/'.createSlug($studio->name);
+      break;
+    case 'BarrysInternational':
+      $url = 'https://international.barrysbootcamp.com/reserve/index.cfm?action=Reserve.chooseClass&site='.$studio->studio_id;
       break;
     case 'Flywheel':
       $url = 'https://www.flywheelsports.com/reserve/2017-06-21?classRoom='.$studio->studio_id.'&classType=flywheel';
-      // $url = 'https://booking.barrysbootcamp.com/reserve/index.cfm?action=Reserve.chooseClass&site=';
       break;
     case 'SoulCycle':
       $url = 'https://www.soul-cycle.com/find-a-class/studio/'.$studio->studio_id;
@@ -131,6 +139,9 @@ function getSite($studio){
     case 'Barrys':
       $site = 'barrysbootcamp';
       break;
+    case 'BarrysInternational':
+      $site = 'barrysbootcampInternational';
+      break;
     case 'Flywheel':
       $site = 'flywheel';
       break;
@@ -148,6 +159,7 @@ function getSite($studio){
 }
 function getSiteOption(){
   return[
+    'BarrysInternational'=>'Barrys International',
     'Barrys'=>'Barrys',
     'Flywheel'=>'Flywheel',
     'SoulCycle'=>'SoulCycle',

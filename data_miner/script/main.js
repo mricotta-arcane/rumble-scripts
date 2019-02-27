@@ -57,7 +57,7 @@ if (typeof length === 'undefined' || length === null) {
 
 var site = casper.cli.get('site');
 if (typeof site === 'undefined' || site === null || site == 'barrys') {
-  var site = "barrysbootcamp_2";
+  var site = "barrysbootcamp";
 }
 
 var publicPath = path + 'public/data_miner/log/';
@@ -108,6 +108,7 @@ timeformat = 'llll';
 classTZ = 'America/New_York';
 var gap = {
   'barrysbootcamp': 10,
+  'barrysbootcampInternational': 10,
   'sbxboxing': 10,
   'soulcycle': 30
 };
@@ -115,6 +116,7 @@ var forceHourCheck = true;
 if (forceHourCheck === true) {
   gap = {
     'barrysbootcamp': 10,
+    'barrysbootcampInternational': 10,
     'sbxboxing': 60,
     'soulcycle': 60
   };
@@ -315,377 +317,152 @@ casper.start('https://www.barrysbootcamp.com/', function () {
       });
 
       break;
-    case 'barrysbootcampOLD':
-      username = 'james.k@leanfwk.com';
-      //username = 'jtyson@dadstie.com';
-      password = 'Afkalh!34';
-      //password = 'paxxwerd';
-      loginUrl = 'https://www.barrysbootcamp.com/login/login/';
-      //loginUrl = 'https://international.barrysbootcamp.com/reserve/index.cfm?action=Account.login';
-      accountUrl = 'https://www.barrysbootcamp.com/'; //'https://www.barrysbootcamp.com/my-account/'
-      classesUrl = 'https://www.barrysbootcamp.com/schedule/';
-      var today = new Date();
-      var currentDate = today.toISOString().substring(0, 10);
-      casper.thenOpen(loginUrl, function () {
-        this.echo('login page opened');
-        this.then(function () {
-          this.once('url.changed', function (uri) {
-            if (uri.indexOf('mtredirect') >= 0) {
-              this.echo('redirected us');
-              this.thenOpen(loginUrl, function () {
-
-              });
-            }
+    case 'barrysbootcampInternational':
+      // username = 'james.k@leanfwk.com';
+      username = 'jtyson@dadstie.com';
+      // password = 'Afkalh!34';
+      password = 'paxxwerd';
+      loginUrl = 'https://international.barrysbootcamp.com/reserve/index.cfm?action=Account.login';
+      accountUrl = 'https://international.barrysbootcamp.com/reserve/index.cfm?action=Account.info';
+      classesUrl = 'https://international.barrysbootcamp.com/reserve/index.cfm?action=Reserve.chooseClass&site=';
+      classUrl = 'https://international.barrysbootcamp.com/reserve/index.cfm?action=Reserve.chooseSpot&classid=';
+      this.thenOpen(loginUrl, function () {
+        this.waitForSelector('form[name="loginForm"]', function () {
+          this.fillSelectors('form[name="loginForm"]', {
+            'input[name="username"]': username,
+            'input[name="password"]': password
+          }, true);
+          this.waitForUrl(accountUrl, function () {
+            //this.echo('Logged into sbxboxing');
+          }, function () {
+            this.echo('Failed to login');
           });
-        });
-        this.then(function () {
-          this.wait(1000, function () {
-            this.then(function () {
-              /*this.waitForSelector('#international_select option:nth-of-type(2)',function(){
-              	this.echo('dropdown appeared');
-              	this.then(function(){
-              		casper.selectOptionByValue = function(selector, valueToMatch){
-              			this.evaluate(function(selector, valueToMatch){
-              				var select = document.querySelector(selector),
-              					found = false;
-              				Array.prototype.forEach.call(select.children, function(opt, i){
-              					if (!found && opt.value.indexOf(valueToMatch) !== -1) {
-              						select.selectedIndex = i;
-              						found = true;
-              					}
-              				});
-              				// dispatch change event in case there is some kind of validation
-              				var evt = document.createEvent("UIEvents"); // or "HTMLEvents"
-              				evt.initUIEvent("change", true, true);
-              				select.dispatchEvent(evt);
-              			}, selector, valueToMatch);
-              		};
 
-              		casper.selectOptionByValue('#international_select', 'https://www.barrysbootcamp.com/login/login');
-              	});
-              	this.then(function(){
-              		this.wait(3000, function(){
-
-              		});
-              	});
-              	//this.click('#international_select option[value="https://www.barrysbootcamp.com/login/login"]');
-              });*/
-              this.then(function () {
-                this.echo('checking if form exists');
-                this.waitForSelector('form.MT_form-login__form', function () {
-                  this.echo('form loaded 1');
-                  if (casper.exists('form input[name="email"]')) {
-                    this.echo('fields loaded');
-                    this.fillSelectors('form.MT_form-login__form', {
-                      'input[name="email"]': username,
-                      'input[name="password"]': password
-                      //},true);
-                      //}, false);
-                    });
-                    //this.click('button[type="submit"]');
-                    //this.click('button.MT_login__login-button');
-                    this.clickLabel('Login', 'button');
-                  } else {
-                    this.echo('fields never loaded');
-                  }
-                }, function timeout() {
-                  this.waitForSelector('form[name="loginForm"]', function () {
-                    this.echo('form loaded 2');
-                    this.fillSelectors('form[name="loginForm"]', {
-                      'input[name="username"]': username,
-                      'input[name="password"]': password
-                      //},true);
-                      //}, false);
-                    });
-                    //this.click('button[type="submit"]');
-                    //this.click('button.MT_login__login-button');
-                    this.clickLabel('Sign In', 'button');
-                  }, function timeout() {
-                    this.waitForSelector('button.MT_customer-loggedin__logout-button', function () {
-                      this.echo('customer already logged in apparently');
-                    }, function timeout() {
-                      casper.then(function () {
-                        this.waitForSelector('MT_create-account MT_create-account__link-text', function () {
-                          this.echo('no button, no form, just this link which means JS is not running on site');
-                        }, function () {
-                          this.echo('nada');
-                        });
-                      });
-
-                    });
-                  });
-                });
-              });
-            });
-          });
-          this.wait(3000, function () {
-            // Do nothing
-          });
-        });
-        // Start Type loop
-        this.then(function () {
-          this.eachThen(locations.all.Barrys, function (r) {
+          // Start Type loop
+          this.eachThen(locations.all.BarrysInternational, function (r) {
             classLocationId = r.data.studio_id;
-            classLocationNameOrig = r.data.name;
-            classLocationName = classLocationNameOrig.replace(/\s+/g, '-').toLowerCase();
             var barryClassTZ = r.data.timezone;
+            classAll = [];
             var seats = JSON.parse(r.data.seat);
             classSeats = seats.seats;
             classFloors = seats.floors;
-            this.thenOpen(classesUrl + classLocationName + '/#/week/', function () {
-              this.echo('opened page');
-
-              this.waitForSelector('.MT_schedule-week__filters', function () {
-                this.wait(3500, function () {
-                  var locId = this.evaluate(function () {
-                    return jQuery('#mariana-schedule-week-routable-binding').attr('data-mariana-location-id');
-                  });
-                  classlist = this.evaluate(function (selector) {
-                    var classlist = [];
-                    if ($(selector).length > 0) {
-                      $.each($(selector), function (i, v) {
-                        var sb = $(v);
-                        var rowId = sb.attr('id');
-                        var classId = sb.find('.MT_button').attr('id');
-                        var classTime = sb.find('.MT_schedule__time').text().trim();
-                        var className = sb.find('.MT_schedule__class-name').text().trim();
-                        var className = className.substring(0, className.indexOf('('));
-                        var classLength = sb.find('.MT_schedule__duration').text().trim();
-                        var classInstructor = sb.find('.MT_schedule__instructor-name').text().trim();
-                        var month = $('.MT_week-nav__day-button:first-of-type').find('.MT_week-nav__date-month').text().trim();
-                        var day = $('.MT_week-nav__day-button:first-of-type').find('.MT_week-nav__date').clone().children().remove().end().text().trim();
-                        var dater = month + day;
-                        var classDate = new Date().getFullYear() + '/' + dater;
-                        var classFull = true;
-
-                        if (sb.find('.MT_schedule__waitlist-button').length) {
-                          classFull = true;
-                        } else if (sb.find('.MT_schedule__register-button').length) {
-                          classFull = 'reserve';
-                        } else if (sb.find('.MT_schedule__class-cancelled').length) {
-                          classFull = 'cancelled';
-                        }
-                        var co = {
-                          'nth': i + 1,
-                          'classId': classId,
-                          'classTime': classTime,
-                          'className': className,
-                          'classInstructor': classInstructor,
-                          'classLength': classLength,
-                          'classDate': classDate,
-                          'classFull': classFull,
-                          'rowId': rowId
-                        };
-                        classlist.push(co);
-                      });
+            this.thenOpen(classesUrl + classLocationId, function () {
+              classLocationTitle = this.getHTML('.page-header.classes h1').trim();
+              // Set selector based on datalength
+              selector = '.tab-pane.active .scheduleBlock:not(.empty)';
+              switch (length) {
+                case 'week':
+                  selector = '.scheduleBlock:not(.empty)';
+                  break;
+              }
+              // Get possible classes
+              classes = this.evaluate(function (selector) {
+                var classes = [];
+                if ($(selector).length) {
+                  $.each($(selector), function (i, v) {
+                    var sb = $(v);
+                    var classId = sb.data('classid');
+                    var classTime = sb.find('.scheduleTime').text().trim();
+                    var className = sb.find('.scheduleClass').text().trim();
+                    var classInstructor = sb.find('.scheduleInstruc').text().trim();
+                    var classLength = sb.find('.classlength').text().trim();
+                    var classDate = sb.siblings('h3').text().trim();
+                    var classFull = false;
+                    if (sb.find('.badge.waitlist').length || sb.find('.badge.full').length) {
+                      classFull = true;
                     }
-                    return classlist;
-                  }, {
-                    selector: '.MT_schedule__table-body tr'
+                    var co = {
+                      'classId': classId,
+                      'classTime': classTime,
+                      'className': className,
+                      'classInstructor': classInstructor,
+                      'classLength': classLength,
+                      'classDate': classDate,
+                      'classFull': classFull,
+                    };
+                    classes.push(co);
                   });
-                  if (classlist !== null && classlist.length > 0) {
-                    this.eachThen(classlist, function (ee) {
-                      var row = ee.data;
-                      if (classLocationId === 11 && forceHourCheck === false) {
-                        classNow = moment().tz(barryClassTZ).add(130, 'minutes');
-                      }
-                      var classNow = moment().tz(barryClassTZ).add(gap[site], 'minutes');
-                      var writeLog = false;
-                      this.wait(3500, function () {
-                        currentTime = moment().tz('America/New_York').format(timeformat);
-                        classTime = moment(row.classTime, ["h:mm A"]).format("HH:mm");
-                        classDate = moment(row.classDate + ' ' + classTime);
-                        classDate = moment.tz(classDate.format(), 'YYYY-MM-DDTHH:mm:ss', barryClassTZ);
-                        // If we are within the booking window
-                        // and if there is a reserve button or a waitlist button
-                        if (classNow < classDate && (row.classFull === true || row.classFull === 'reserve' || row.classFull === 'cancelled')) {
-                          writeLog = true;
-                        }
-                        if ((row.classFull !== true || row.classFull == 'reserve') && writeLog === true) {
-                          //this.waitForSelector('button#'+row.classId, function(){
-                          this.waitForSelector(".MT_schedule__table-body tr:nth-of-type(" + row.nth + ") .MT_schedule__register-button", function () {
-                            //this.click('button#'+row.classId);
-                            this.click('.MT_schedule__table-body tr:nth-of-type(' + row.nth + ') .MT_schedule__register-button');
-                            this.echo('waiting for map');
-                            this.once('url.changed', function (url) {
-                              if (url.indexOf('mtredirect') >= 0) {
-                                this.echo('redirected us again');
-                                this.then(function () {
-                                  this.echo('checking if form exists');
-                                  this.waitForSelector('form.MT_form-login__form', function () {
-                                    this.echo('form loaded 1');
-                                    if (casper.exists('form input[name="email"]')) {
-                                      this.echo('fields loaded');
-                                      this.fillSelectors('form.MT_form-login__form', {
-                                        'input[name="email"]': username,
-                                        'input[name="password"]': password
-                                        //},true);
-                                        //}, false);
-                                      });
-                                      //this.click('button[type="submit"]');
-                                      //this.click('button.MT_login__login-button');
-                                      this.clickLabel('Login', 'button');
-                                    } else {
-                                      this.echo('fields never loaded');
-                                    }
-                                  }, function timeout() {
-                                    this.waitForSelector('form[name="loginForm"]', function () {
-                                      this.echo('form loaded 2');
-                                      this.fillSelectors('form[name="loginForm"]', {
-                                        'input[name="username"]': username,
-                                        'input[name="password"]': password
-                                        //},true);
-                                        //}, false);
-                                      });
-                                      //this.click('button[type="submit"]');
-                                      //this.click('button.MT_login__login-button');
-                                      this.clickLabel('Sign In', 'button');
-                                    }, function timeout() {
-                                      this.waitForSelector('button.MT_customer-loggedin__logout-button', function () {
-                                        this.echo('customer already logged in apparently');
-                                      }, function timeout() {
-                                        casper.then(function () {
-                                          this.waitForSelector('MT_create-account MT_create-account__link-text', function () {
-                                            this.echo('no button, no form, just this link which means JS is not running on site');
-                                          }, function () {
-                                            this.echo('nada');
-                                          });
-                                        });
+                }
+                return classes;
+              }, {
+                selector: selector
+              });
+              if (classes !== null) {
+                //this.echo('POSSIBLE CLASSES: '+classes.length);
 
-                                      });
-                                    });
-                                  });
-                                });
-                                this.thenOpen(classesUrl + classLocationName + '/#/week/', function () {
-                                  this.echo('supposedly we are logged in and back to the previous page');
-                                  this.wait(3500, function () {
-                                    if (casper.exists(".MT_schedule__table-body tr(" + row.nth + ") .MT_schedule__register-button")) {
-                                      this.click('.MT_schedule__table-body tr(' + row.nth + ') .MT_schedule__register-button');
-                                    }
-                                  });
-                                });
-                              }
-                            });
-                          }, function timeout() {
-                            this.reload();
-                            this.echo('that selector was not showing for no good reason, so I am refreshing');
-                            this.click('.MT_schedule__table-body tr(' + row.nth + ') .MT_schedule__register-button');
-                            this.once('url.changed', function (url) {
-                              if (url.indexOf('mtredirect') >= 0) {
-                                this.echo('redirected us again');
-                                this.reload();
-                                this.waitForSelector('form.MT_form-login__form', function () {
-                                  this.fillSelectors('form.MT_form-login__form', {
-                                    'input[name="email"]': username,
-                                    'input[name="password"]': password
-                                    //},true);
-                                  });
-                                  //this.click('button[type="submit"]');
-                                  //this.click('button.MT_login__login-button');
-                                  this.clickLabel('Login', 'button');
-                                });
-                                this.then(function () {
-                                  this.page.close();
-                                  this.page = require('webpage').create();
-                                });
-                                this.thenOpen(classesUrl + classLocationName + '/#/week/', function () {
-                                  this.echo('supposedly we are logged in and back to the previous page');
-                                  this.wait(3500, function () {
-                                    if (casper.exists(".MT_schedule__table-body tr(" + row.nth + ") .MT_schedule__register-button")) {
-                                      this.click('.MT_schedule__table-body tr(' + row.nth + ') .MT_schedule__register-button');
-                                    }
-                                  });
-                                });
-                              }
-                            });
-                          });
-                          this.waitForSelector('.MT_layout-spot--available', function () {
-                            //this.waitForSelector('#mariana-schedule-week-routable-binding', function(){
-                            //var classId = this.getCurrentUrl().substr(this.getCurrentUrl().lastIndexOf('/') + 1);
-                            // Refactor we need to collect floors and treads separately
-                            classEnrolledFloors = 0;
-                            classAvailableFloors = 0;
-                            classEnrolledSeats = this.evaluate(function () {
-                              return $('.MT_layout-spot--reserved').length;
-                            });
-                            classAvailableSeats = this.evaluate(function () {
-                              return $('.MT_layout-spot--available').length;
-                            });
-                            var totalSpots = classSeats + classFloors;
-                            if (classEnrolledSeats == totalSpots) {
-                              writeLog = false;
-                            }
-                            /*if((classAvailableSeats.length && classAvailableSeats > 0) || (classEnrolledSeats.length && classEnrolledSeats < (classSeats + classFloors))){
-                            	var writeLog = true;
-                            } else {
-                            	var writeLog = false;
-                            }*/
-                            /*classSeats = this.evaluate(function(){
-                            	return $('.MT_layout-spot').length;
-                            });*/
-                          }, function timeout() {
-                            this.waitForSelector('.MT_register-flow__pick-button', function () {
-                              writeLog = false;
-                            }, function timeout() {
-                              writeLog = false;
-                            });
-                          });
-                          this.back();
-                        } else if (row.classFull == 'cancelled') {
-                          classAvailableSeats = classSeats;
-                          classAvailableFloors = classFloors;
-                          classEnrolledSeats = classEnrolledFloors = 0;
-                        } else if (row.classFull === true) {
-                          // if class is full
-                          classAvailableSeats = classAvailableFloors = 0;
-                          classEnrolledSeats = classSeats;
-                          classEnrolledFloors = classFloors;
-                          // end if class is full
-                          var classJumpChecks = moment().tz(barryClassTZ).add(240, 'minutes');
-                          var classJumpChecksTwo = moment().tz(barryClassTZ).add(61, 'minutes');
-                          if (classJumpChecks > classDate && classJumpChecksTwo < classDate) {
-                            var writeLog = false;
-                          }
-                        } else {
-                          writeLog = false;
-                        }
-                        if (writeLog === true) {
-                          console.log('write log is true');
-                          classCsvLineArray = [
-                            currentTime, //set
-                            row.className, //set
-                            classLocationNameOrig, //set
-                            row.classInstructor, //set
-                            classDate.format(timeformat), //set
-                            //classDate+' '+classTime,	//set
-                            row.classLength, //set
-                            classFloors, //refactor
-                            classEnrolledFloors, //refactor
-                            classAvailableFloors, //refactor
-                            classSeats, //set
-                            classEnrolledSeats, //set
-                            classAvailableSeats, //set
-                            //classLocationId,			//set
-                            classDate.format(timeformat)
-                            //classId,				//set
-                            //'classTime',
-                          ];
-                          writeFile(site, classCsvLineArray, classLocationId, barryClassTZ);
-                        }
-                      });
-                    });
-                  } else {
-                    this.echo('class list is empty');
+                // Loop through classes
+                this.eachThen(classes, function (rr) {
+                  var co = rr.data;
+                  var classNow = moment().tz(barryClassTZ).add(gap[site], 'minutes');
+                  if (classLocationId === 11 && forceHourCheck === false) {
+                    classNow = moment().tz(barryClassTZ).add(60, 'minutes');
                   }
-                });
-              }, function timeout() {
-                this.echo('timed out but moving on');
-              });
+                  var writeLog = false;
+                  currentTime = moment().tz('America/New_York').format(timeformat);
+                  classDate = moment(co.classDate + ' ' + co.classTime);
+                  classDate = moment.tz(classDate.format(), 'YYYY-MM-DDTHH:mm:ss', barryClassTZ);
 
-              this.then(function () {
-                this.page.close();
-                this.page = require('webpage').create();
-              });
+                  if (classNow < classDate) {
+                    writeLog = true;
+                  }
+                  // if class is full
+                  classAvailableSeats = classAvailableFloors = 0;
+                  classEnrolledSeats = classSeats;
+                  classEnrolledFloors = classFloors;
+                  if (co.classFull !== true && writeLog === true) {
+                    this.thenOpen(classUrl + co.classId, function () {
+                      var currentUrl = this.getCurrentUrl();
+                      if (currentUrl == classUrl + co.classId) {
+                        // classSeats = this.evaluate(function(){
+                        //   return $('.spotcell:not(.floor)').length;
+                        // });
+                        classEnrolledSeats = this.evaluate(function () {
+                          return $('.spotcell.Enrolled:not(.floor)').length;
+                        });
+                        classAvailableSeats = classSeats - classEnrolledSeats;
+
+                        // classFloors = this.evaluate(function(){
+                        //   return $('.spotcell.floor').length;
+                        // });
+                        classEnrolledFloors = this.evaluate(function () {
+                          return $('.spotcell.Enrolled.floor').length;
+                        });
+                        classAvailableFloors = classFloors - classEnrolledFloors;
+                      }
+                    });
+                  }
+                  if (writeLog === true) {
+                    this.then(function () {
+                      var classCsvLineArray = [
+                        currentTime,
+                        co.className,
+                        classLocationTitle,
+                        co.classInstructor,
+                        classDate.format(timeformat),
+                        co.classLength,
+                        classFloors,
+                        classEnrolledFloors,
+                        classAvailableFloors,
+                        classSeats,
+                        classEnrolledSeats,
+                        classAvailableSeats,
+                        co.classId
+                      ];
+                      classAll.push(classCsvLineArray);
+                      writeFile(site, classCsvLineArray, classLocationId, barryClassTZ);
+                    });
+                  }
+
+
+                });
+
+              }
+              // Write Summary File
+              // this.then(function(){
+              //   if(length !== 'day'){
+              //     writeSummary(site,classAll,classLocationId,classLocationTitle,classDay);
+              //   }
+              // });
             });
           });
         });
@@ -1051,7 +828,7 @@ var getCount = function (checkStr, returnCount) {
 var writeFile = function (site, classCsvLineArray, classLocationId, classTZ) {
   var withinTen;
   switch (site) {
-    case 'barrysbootcamp_2':
+    case 'barrysbootcampInternational':
       withinTen = moment().tz(classTZ).add(gap[site] + 11, 'minutes');
       if (classLocationId === 11 && forceHourCheck === false) {
         withinTen = moment().tz(classTZ).add(91, 'minutes');
@@ -1081,7 +858,7 @@ var writeFile = function (site, classCsvLineArray, classLocationId, classTZ) {
   // Date, Name, Location, Instructor, Datetime, Length, Floors, Enrolled floors, Open floors, Seats, Enrolled seats, Open seats
   // Add header if file is new
   if (!fs.exists(fileSingle)) {
-    if (site == 'barrysbootcamp' || site == 'barrysbootcamp2') {
+    if (site == 'barrysbootcamp' || site == 'barrysbootcampInternational') {
       fs.write(fileSingle, 'Date;Name;Location;Instructor;Datetime;Length;Floors;Enrolled floors;Open floors;Treads;Enrolled treads;Open treads;Class ID \r\n', 'a');
     } else {
       fs.write(fileSingle, 'Date;Name;Location;Instructor;Datetime;Length;Seats;Enrolled seats;Open seats;Class ID \r\n', 'a');

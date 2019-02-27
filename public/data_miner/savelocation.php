@@ -19,7 +19,7 @@ if(!empty($_POST)){
     $return['errors']['seat'][]="Seat is required";
   } else {
     $seat = $_POST['seat'];
-    if ($_POST['site']=='Barrys') {
+    if ($_POST['site']=='Barrys' || $_POST['site']=='BarrysInternational') {
       $seatobj = json_decode($seat);
       if(empty($seatobj->seats) || empty($seatobj->floors)){
         $return['errors']['seat'][]='Please use {"seats":25,"floors":32} format for Barrys location';
