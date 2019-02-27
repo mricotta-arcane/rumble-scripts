@@ -62,6 +62,9 @@ function summaryWriter($start=null,$end=null){
       case 'Barrys':
         $site = 'barrysbootcamp';
         break;
+			case 'BarrysInternational':
+				$site = 'barrysbootcampInternational';
+				break;
       case 'Flywheel':
         $site = 'flywheel';
         break;
@@ -164,7 +167,7 @@ function summaryWriter($start=null,$end=null){
 							continue;
 						  }
 						}
-						if ($website == 'barrysbootcamp') {
+						if ($website == 'barrysbootcamp' || $website == 'barrysbootcampInternational') {
 						  if(!empty($r[12])){
 							//$class_id = strtotime($r[12]); 
 							$class_id = $r[12];
