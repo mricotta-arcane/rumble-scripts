@@ -60,7 +60,8 @@ var logify = false;
 var currentTime = '';
 var mailerkey = 'AV5Zsslka';
 //var rooms = {FlatironChelsea:'12900000001',NoHo:'12900000003'};	// These are the 3 different types of reports that we'll loop through
-var rooms = {'12900000002':['12900000001','12900000003','12900000006','12900000007'],'12900000004':['12900000009'],'751454502594283131':['751454502619448957']};	// These are the 3 different types of reports that we'll loop through
+var rooms = {'12900000002':['12900000001','12900000003','12900000006','12900000007'],'12900000004':['12900000009'],'751454502594283131':['751454502619448957'],'844951477611922822':['844951477637088648'],'844951479021209042':['844951479029597652']};
+// These are the 3 different types of reports that we'll loop through
 
 casper.start(adminUrl, function(){
   // this.echo("page loaded");
@@ -156,6 +157,10 @@ casper.then(function(){
 							var room = 'UESStudio4';
 						} else if(identifier == '751454502619448957'){
 							var room = 'FiDi';
+						} else if(identifier == '844951477637088648'){
+							var room = 'CenterCity';
+						} else if(identifier == '844951479029597652'){
+							var room = 'RumbleDC';
 						}
 						this.echo('room selected');
 						this.thenOpen(bookerUrl, function(){

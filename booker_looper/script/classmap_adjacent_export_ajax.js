@@ -89,8 +89,20 @@ var rooms = [
 		siteid:'751454502594283131',
 		id:'751454502619448957',
 		room:'FiDi',
-		locale:'America/New_York'
+		locale:'America/Los_Angeles'
 	},
+        {
+                siteid:'844951477611922822',
+                id:'844951477637088648',
+                room:'CenterCity',
+                locale:'America/New_York'
+        },
+        {
+                siteid:'844951479021209042',
+                id:'844951479029597652',
+                room:'RumbleDC',
+                locale:'America/New_York'
+        },
 ];
 
 // Login first

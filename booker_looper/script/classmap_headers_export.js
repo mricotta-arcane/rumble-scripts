@@ -66,7 +66,7 @@ var waitlistEmpty = dontopenStatus = classButtonClosed = bookableSpot = false;
 var currentTime = '';
 var mailerkey = 'AV5Zsslka';
 var logs = '/var/www/html2/rumble-scripts/zflogs/';
-var rooms = {'12900000002':['12900000001','12900000003','12900000006','12900000007'],'12900000004':['12900000009'],'751454502594283131':['751454502619448957']};
+var rooms = {'12900000002':['12900000001','12900000003','12900000006','12900000007'],'12900000004':['12900000009'],'751454502594283131':['751454502619448957'],'844951477611922822':['844951477637088648'],'844951479021209042':['844951479029597652']};
 var locale = 'America/New_York';
 
 casper.start(adminUrl, function(){
@@ -133,19 +133,23 @@ casper.then(function(){
 			var bookerUrl = bookerPage+"&roomid="+identifier;
 			//console.log(bookerUrl);
 			var locale = 'America/New_York';
-			if(identifier == '12900000001') { 
-				var room = 'FlatironChelsea';
-			} else if(identifier == '12900000003') { 
-				var room = 'NoHo';
-			} else if(identifier == '12900000009') { 
-				var room = 'WeHo';
-				var locale = 'America/Los_Angeles';
-			} else if(identifier == '12900000006') { 
-				var room = 'UES2';
-			} else if(identifier == '12900000007') { 
-				var room = 'UES4';
+                        if(identifier == '12900000001') {
+                                var room = 'FlatironChelsea';
+                        } else if(identifier == '12900000003') {
+                                var room = 'NoHo';
+                        } else if(identifier == '12900000009') {
+                                var room = 'WeHo';
+                                var locale = 'America/Los_Angeles';
+                        } else if(identifier == '12900000006') {
+                                var room = 'UES2';
+                        } else if(identifier == '12900000007') {
+                                var room = 'UES4';
                         } else if(identifier == '751454502619448957'){
                                 var room = 'FiDi';
+                        } else if(identifier == '844951477637088648'){
+                                var room = 'CenterCity';
+                        } else if(identifier == '844951479029597652'){
+                                var room = 'RumbleDC';
                         }
 			this.echo('room selected');
 			//retrieve classes
