@@ -8,7 +8,9 @@ function canRun($condition){
         return (date('j') == 1 && date('G') == 4 && intval(date('i')) == 30);
     }else if($condition == 'notes'){
         return false; // Disable notes log.
-    }
+    }else if($condition == 'sales2'){
+		return (date('G') == 2 && intval(date('i')) == 0);
+	}
 
     return false; // If log type has a condition that's not defined, don't run it.
 }
@@ -105,6 +107,70 @@ function saveSalesData($log, $data, $url, $curl, $same_file = false){
             'type' => stristr($order->orderDetails[0]->details, 'series') ? 'series' : 'product',
             'firstname' => $order->customer->firstName,
             'lastname' => $order->customer->lastName,
+			'employeeId' => $order->employeeId,
+            'site_id' => $order->site->id,
+            'site' => $order->site->name,
+            'cost' => (int)$order->total->amount,
+            'gateway_id' => $order->gatewayId,
+            'gateway' => ''
+        ]);
+    }
+
+    foreach($saveResources as $handle)
+        fclose($handle); // Clean up.
+    
+    if(!empty($data->meta) && $data->meta->current_page != $data->meta->last_page && $same_file === false){
+        $next_page = intval($data->meta->current_page);
+        do{
+            $next_page++;
+            $log['params']['page'] = $next_page;
+            $post = empty($log['json']) ? http_build_query($log['params']) : json_encode($log['params']);
+            curl_setopt($curl, CURLOPT_HTTPGET, true);
+            curl_setopt($curl, CURLOPT_URL, $url . '?' . $post);
+            $log['saveFn']($log, curl_exec($curl), $url, $curl, true);
+        }while($next_page < intval($data->meta->last_page));
+    }
+}
+
+function saveSalesData2($log, $data, $url, $curl, $same_file = false){
+    global $rflogs_dir;
+
+    $data = json_decode($data);
+    $path = $rflogs_dir . 'sales/sales_';
+    $saveResources = [];
+    $date = date('m-d-Y', strtotime('yesterday'));
+    
+    foreach($data->data as $order){
+        $site = str_replace(' ', '-', $order->site->name);
+        if(!array_key_exists($site, $saveResources)){
+            $saveResources[$site] = fopen($path . $site . '_' . $date . '.csv', $same_file ? 'a' : 'w');
+            if(!$same_file){
+                fputcsv($saveResources[$site], [
+                    'date', 'order_id', 'customer_id', 'payment_type', 'price',
+                    'quantity', 'discount', 'tax', 'total', 'revenue',
+                    'itemid', 'item', 'type', 'firstname', 'lastname',
+                    'site_id', 'site', 'cost', 'gateway_id', 'gateway'
+                ]);
+            }
+        }
+        
+        fputcsv($saveResources[$site], [
+            'date' => date('Y-m-d H:i:s', strtotime(str_replace(' - ', ' ', $order->dateClosed))),
+            'order_id' => (string)$order->id,
+            'customer_id' => (string)$order->customer->id,
+            'payment_type' => '',
+            'price' => $order->subtotal->amount,
+            'quantity' => $order->orderDetails[0]->quantity,
+            'discount' => '',
+            'tax' => $order->tax->amount,
+            'total' => $order->total->amount,
+            'revenue' => $order->total->amount,
+            'itemid' => trim(explode(': ', explode('-', $order->orderDetails[0]->details)[0])[1]),
+            'item' => trim(explode(': ', explode('-', $order->orderDetails[0]->details)[1])[1]),
+            'type' => stristr($order->orderDetails[0]->details, 'series') ? 'series' : 'product',
+            'firstname' => $order->customer->firstName,
+            'lastname' => $order->customer->lastName,
+			'employeeId' => $order->employeeId,
             'site_id' => $order->site->id,
             'site' => $order->site->name,
             'cost' => (int)$order->total->amount,
@@ -249,6 +315,16 @@ $logging = [
         'condition' => 'sales', // Once a month.
         'params' => [
             'minDate' => date('Y-m-01 00:00:00', strtotime('last month')),
+            'maxDate' => date('Y-m-d 00:00:00')
+        ]
+    ],
+	[
+        'path' => '/admin/sites/orders',
+        'method' => 'GET',
+        'saveFn' => 'saveSalesData2',
+        'condition' => 'sales2', // Once a month.
+        'params' => [
+            'minDate' => date('Y-m-d 00:00:00', strtotime('yesterday')),
             'maxDate' => date('Y-m-d 00:00:00')
         ]
     ],
