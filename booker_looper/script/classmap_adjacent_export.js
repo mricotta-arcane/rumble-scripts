@@ -245,8 +245,10 @@ casper.then(function(){
 													customername = jQuery(v).find('.spotcustomer a').data('customername');
 													stat = (jQuery(v).hasClass('signedin'))? 'signedin' : 'enrolled';
 													//stat = 'enrolled';
-													row += spotid+','+spotlabel+','+stat+','+customerid+','+customername+'\r\n';
-													//row += spotid+','+spotlabel+','+stat+'\r\n';
+													if(customerid!=='undefined'&&customerid!==null&&typeof customerid !== 'undefined'){
+														row += spotid+','+spotlabel+','+stat+','+customerid+','+customername+'\r\n';
+														//row += spotid+','+spotlabel+','+stat+'\r\n';
+													}
 												} else {
 													//row += 'nothing'+'\r\n';
 												}

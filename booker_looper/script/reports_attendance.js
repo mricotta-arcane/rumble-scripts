@@ -123,26 +123,28 @@ casper.then(function(){
 		casper.then(function(){
                         var startdate = '1%2F1%2F';
                         var enddate = '6%2F30%2F';
+			var hlf = '1';
                         if(currentMonth>6){
                                 var startdate = '7%2F1%2F';
                                 var enddate = '12%2F31%2F';
+				var hlf = '2';
                         }
 			var reportpage = attendanceReportURL+identifier+'&start='+startdate+currentYear+'&end='+enddate+currentYear+'&export=csv';
 			var reporttoday = attendanceReportURL+identifier+'&start='+currentMonth+'%2F'+currentDate+'%2F'+currentYear+'&end='+currentMonth+'%2F'+currentDate+'%2F'+currentYear+'&export=csv';
 			//casper.download(reportpage,logs+"attendance/attendance_"+index+"_"+currentMonth+"-"+currentYear+".csv");
 			// Get full year data
-			casper.download(reportpage,logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv");
+			casper.download(reportpage,logs+"attendance/attendance_"+index+"_"+currentYear+"-"+hlf+".tmp.csv");
 			// Get "today" data
 			casper.download(reporttoday,logs+"attendance/attendance_"+index+"_today.tmp.csv");
 			// Only store full year data if it is valid
-			var fileSizeInBytes = fs.size(logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv");
-			var contents = fs.read(logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv");
+			var fileSizeInBytes = fs.size(logs+"attendance/attendance_"+index+"_"+currentYear+"-"+hlf+".tmp.csv");
+			var contents = fs.read(logs+"attendance/attendance_"+index+"_"+currentYear+"-"+hlf+".tmp.csv");
 			var substr = contents.indexOf('System Error');
 			if((fileSizeInBytes > 200) && (substr == -1)){	// if filesize is greater than 500 and does not contain string
-				if(fs.exists(logs+"attendance/attendance_"+index+"_"+currentYear+".csv")){
-					fs.remove(logs+"attendance/attendance_"+index+"_"+currentYear+".csv");
+				if(fs.exists(logs+"attendance/attendance_"+index+"_"+currentYear+"-"+hlf+".csv")){
+					fs.remove(logs+"attendance/attendance_"+index+"_"+currentYear+"-"+hlf+".csv");
 				}
-				fs.move(logs+"attendance/attendance_"+index+"_"+currentYear+".tmp.csv",logs+"attendance/attendance_"+index+"_"+currentYear+".csv");
+				fs.move(logs+"attendance/attendance_"+index+"_"+currentYear+"-"+hlf+".tmp.csv",logs+"attendance/attendance_"+index+"_"+currentYear+"-"+hlf+".csv");
 			}
 			// Only store today data if it is valid
 			var fileSizeInBytes = fs.size(logs+"attendance/attendance_"+index+"_today.tmp.csv");

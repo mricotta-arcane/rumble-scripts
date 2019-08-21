@@ -195,7 +195,9 @@ casper.then(function(){
 									$.each(spots,function(i,spot){
 										if(spot.attendanceid !== null){
 											stat = (spot.signedin == true)?'signedin':'enrolled';
-											string += spot.id+','+spot.spotlabel+','+stat+','+spot.customerid+','+spot.firstname+' '+spot.lastname+'\r\n';
+											if(spot.customerid != null && spot.customerid != "undefined"){
+												string += spot.id+','+spot.spotlabel+','+stat+','+spot.customerid+','+spot.firstname+' '+spot.lastname+'\r\n';									
+											}
 										}
 									});
 								});
