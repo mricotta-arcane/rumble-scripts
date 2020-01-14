@@ -149,6 +149,30 @@ var rooms = [
     room: "MarinaBoxing",
     locale: "America/Los_Angeles"
   },
+  {
+    siteid: "12900000002",
+    id: "993575127981491254",
+    room: "TribecaBoxingPrivate",
+    locale: "America/New_York"
+  },
+  {
+    siteid: "12900000002",
+    id: "987787678122510199",
+    room: "FlatironChelseaTrainingPrivate",
+    locale: "America/New_York"
+  },
+  {
+    siteid: "751454502594283131",
+    id: "993545852360328706",
+    room: "PaloAltoBoxingPrivate",
+    locale: "America/Los_Angeles"
+  },
+  {
+    siteid: "751454502594283131",
+    id: "987790915714156329",
+    room: "MarinaTrainingPrivate",
+    locale: "America/Los_Angeles"
+  },
 ];
 
 // Login first

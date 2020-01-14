@@ -42,6 +42,10 @@ function attendanceTodayAlert(){
 		'MarinaTraining',
 		//'MarinaBoxing',
 		//'UESTraining',
+		//'TribecaBoxingPrivate',
+		//'FlatironChelseaTrainingPrivate',
+		//'PaloAltoBoxingPrivate',
+		//'MarinaTrainingPrivate',
 		];
   foreach($locations as $location){
 	$filename = 'attendance_'.$location.'_today.csv';

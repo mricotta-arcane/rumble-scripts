@@ -68,9 +68,9 @@ var currentTime = "";
 var mailerkey = "AV5Zsslka";
 var logs = "/var/www/html2/rumble-scripts/zflogs/";
 var rooms = {
-                '12900000002':['12900000001','12900000003','12900000006','12900000007','952965229338167284','984816588140053757','993573905954243636','1048571362064467734'],
+                '12900000002':['12900000001','12900000003','12900000006','12900000007','952965229338167284','984816588140053757','993573905954243636','1048571362064467734','993575127981491254','987787678122510199'],
                 '12900000004':['12900000009'],
-                '751454502594283131':['751454502619448957','984817802458170448','993544502935291504','993546832300737729'],
+                '751454502594283131':['751454502619448957','984817802458170448','993544502935291504','993546832300737729','993545852360328706','987790915714156329'],
                 '844951477611922822':['844951477637088648'],
            };
 
@@ -180,9 +180,19 @@ casper.then(function() {
 		var room = "PaloAltoBoxing";
 		var locale = "America/Los_Angeles";
   	} else if(identifier == '993546832300737729'){
-                var room = 'MarinaBoxing';
+        var room = 'MarinaBoxing';
 		var locale = "America/Los_Angeles";
-        } 
+    } else if(identifier == '993575127981491254'){
+        var room = 'TribecaBoxingPrivate';
+    } else if(identifier == '987787678122510199'){
+        var room = 'FlatironChelseaTrainingPrivate';
+    } else if(identifier == '993545852360328706'){
+        var room = 'PaloAltoBoxingPrivate';
+        var locale = "America/Los_Angeles";
+    } else if(identifier == '987790915714156329'){
+        var room = 'MarinaTrainingPrivate';
+        var locale = "America/Los_Angeles";
+    }
 
       this.echo("room selected");
       //retrieve classes
