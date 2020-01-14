@@ -149,7 +149,7 @@ var rooms = [
     room: "MarinaBoxing",
     locale: "America/Los_Angeles"
   },
-  {
+  /*{
     siteid: "12900000002",
     id: "993575127981491254",
     room: "TribecaBoxingPrivate",
@@ -172,7 +172,7 @@ var rooms = [
     id: "987790915714156329",
     room: "MarinaTrainingPrivate",
     locale: "America/Los_Angeles"
-  },
+  },*/
 ];
 
 // Login first
