@@ -60,7 +60,13 @@ var logify = false;
 var currentTime = '';
 var mailerkey = 'AV5Zsslka';
 //var rooms = {FlatironChelsea:'12900000001',NoHo:'12900000003'};	// These are the 3 different types of reports that we'll loop through
-var rooms = {'12900000002':['12900000001','12900000003','12900000006','12900000007'],'12900000004':['12900000009'],'751454502594283131':['751454502619448957'],'844951477611922822':['844951477637088648'],'844951479021209042':['844951479029597652']};
+var rooms = {
+		'12900000002':['12900000001','12900000003','12900000006','12900000007','952965229338167284','984816588140053757','993573905954243636','1048571362064467734'],
+		'12900000004':['12900000009'],
+		'751454502594283131':['751454502619448957','984817802458170448','993544502935291504','993546832300737729'],
+		'844951477611922822':['844951477637088648'],
+		'844951479021209042':['844951479029597652'],
+	};
 // These are the 3 different types of reports that we'll loop through
 
 casper.start(adminUrl, function(){
@@ -151,6 +157,8 @@ casper.then(function(){
 							var room = 'NoHo';
 						} else if(identifier == '12900000009') { 
 							var room = 'WeHo';
+						} else if(identifier == '1048571362064467734') {
+							var room = 'UESTraining';
 						} else if(identifier == '12900000006') { 
 							var room = 'UESStudio2';
 						} else if(identifier == '12900000007') { 
@@ -161,6 +169,18 @@ casper.then(function(){
 							var room = 'CenterCity';
 						} else if(identifier == '844951479029597652'){
 							var room = 'RumbleDC';
+						} else if(identifier == '984816588140053757'){
+							var room = 'FlatironChelseaTraining';
+						} else if(identifier == '952965229338167284'){
+							var room = 'Brooklyn';
+						} else if(identifier == '993573905954243636'){
+							var room = 'TribecaBoxing';
+						} else if(identifier == '984817802458170448'){
+							var room = 'MarinaTraining';
+						} else if(identifier == '993544502935291504'){
+							var room = 'PaloAltoBoxing';
+						} else if(identifier == '993546832300737729'){
+							var room = 'MarinaBoxing';
 						}
 						this.echo('room selected');
 						this.thenOpen(bookerUrl, function(){

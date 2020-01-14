@@ -84,6 +84,12 @@ var rooms = [
     locale: "America/New_York"
   },
   {
+    siteid: "12900000002",
+    id: "1048571362064467734",
+    room: "UESTraining",
+    locale: "America/New_York"
+  },
+  {
     siteid: "12900000004",
     id: "12900000009",
     room: "WeHo",
@@ -108,11 +114,41 @@ var rooms = [
     locale: "America/New_York"
   },
   {
-    siteid: "952965229287835635",
+    siteid: "12900000002",
     id: "952965229338167284",
     room: "Brooklyn",
     locale: "America/New_York"
-  }
+  },
+  {
+    siteid: "12900000002",
+    id: "984816588140053757",
+    room: "FlatironChelseaTraining",
+    locale: "America/New_York"
+  },
+  {
+    siteid: "12900000002",
+    id: "993573905954243636",
+    room: "TribecaBoxing",
+    locale: "America/New_York"
+  },
+  {
+    siteid: "751454502594283131",
+    id: "984817802458170448",
+    room: "MarinaTraining",
+    locale: "America/Los_Angeles"
+  },
+  {
+    siteid: "751454502594283131",
+    id: "993544502935291504",
+    room: "PaloAltoBoxing",
+    locale: "America/Los_Angeles"
+  },
+  {
+    siteid: "751454502594283131",
+    id: "993546832300737729",
+    room: "MarinaBoxing",
+    locale: "America/Los_Angeles"
+  },
 ];
 
 // Login first

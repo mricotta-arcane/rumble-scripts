@@ -3,3 +3,5 @@ public/**/*.txt
 public/**/*.csv
 *.zip
 zflogs/
+rflogs/
+booker_looper.txt

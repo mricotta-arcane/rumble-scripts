@@ -60,31 +60,6 @@ var eolm = new Date(currentYearFull, lastMonth, 0).toString().substr(8,2);		// e
 var bookerUrl = 'https://rumble.zingfitstudio.com/index.cfm?action=Booker.view';
 var regions = ['12900000002','12900000004','751454502594283131','844951477611922822','844951479021209042'];
 // These are all the revenue reports that we'll loop through
-var revenueReports = {
-		//1 Class
-		OneClass : '12900000001',
-		//5 Classes
-		FiveClass : '12900000007',
-		//Prelaunch 10
-		PreLaunchTen : '12900000028',
-		//10 classes
-		TenClass : '12900000008',
-		// 50 pack
-		FiftyPack : '12900000005',
-		//Tandem Training Add a Friend
-		Tandem : '12900000017',
-		//Private Training Session
-		PrivateTraining : '12900000013',
-		//PPX+1 - 1 Class
-		Ppx1OneClass : '12900000021',
-		//PPX+1 - 5 Classes
-		Ppx1FiveClass : '12900000022',
-		//Events - Bag Blocks
-		Events : '12900000020',
-		//First time
-		//FirstTime : '12900000006',
-	};
-
 // From Database
 var revenueReportsAll = {
 	12900000001:"1 Class  - New York",
@@ -175,6 +150,23 @@ var revenueReportsAll = {
 	850014806378284789:"20 CLASSES - WASHINGTON DC",
 	850015225582191970:"30 CLASSES - WASHINGTON DC",
 	850017096149501564:"RUMBLE PLATINUM - WASHINGTON DC",
+	997732085126923398:'FIRST TIME TRAINING (2 for 1) - New York',
+	996482703719138841:'FIRST TIME TRAINING (2 for 1) - San Francisco',
+	1048452886918334119:"Rumble Program - 12 Classes - NY",
+	1048453671530005991:"Rumble Program - 16 Classes - NY",
+	1048454098107500495:"Rumble Program - 20 Classes - NY",
+	1048455289675711835:"Rumble Program - 12 Classes - SF",
+	1048455704005838620:"Rumble Program - 16 Classes - SF",
+	1048456072332838058:"Rumble Program - 20 Classes - SF",
+	1048456714162014085:"Rumble Program - 12 Classes - LA",
+	1048457120875284468:"Rumble Program - 16 Classes - LA",
+	1048457477357569102:"Rumble Program - 20 Classes - LA",
+	1048457916962571783:"Rumble Program - 12 Classes - DC",
+	1048458482983896104:"Rumble Program - 16 Classes - DC",
+	1048458792078935433:"Rumble Program - 20 Classes - DC",
+	1048459255012657015:"Rumble Program - 12 Classes - PA",
+	1048459624832828716:"Rumble Program - 16 Classes - PA",
+	1048459982405633640:"Rumble Program - 20 Classes - PA",
 }
 	
 var months = ['1','2','3','4','5','6','7','8','9','10','11','12'];
@@ -242,12 +234,12 @@ casper.then(function(){
 			} else { 
 				var loc = 'NY';
 			}*/
-			Object.keys(revenueReports).forEach(function(index){	
-				var identifier = revenueReports[index];
-				var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+identifier+'&start=1%2F1%2F'+currentYear+'&end=12%2F31%2F'+currentYear;
+			Object.keys(revenueReportsAll).forEach(function(index){	
+				var identifier = revenueReportsAll[index];
+				var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+index+'&start=1%2F1%2F'+currentYear+'&end=12%2F31%2F'+currentYear;
 				var filename = logs+'revenue/RevenueReport_'+index+'_'+identifier+'.csv';
 				if(index == 'FirstTime'){
-					var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+identifier+'&start='+currentMonth+'%2F1%2F'+currentYear+'&end='+currentMonth+'%2F'+eom+'%2F'+currentYear;
+					var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+index+'&start='+currentMonth+'%2F1%2F'+currentYear+'&end='+currentMonth+'%2F'+eom+'%2F'+currentYear;
 					var filename = logs+'revenue/RevenueReport_'+index+'_'+identifier+'_this-month-src.csv';
 				}
 				casper.thenOpen(revenueURL, function(){

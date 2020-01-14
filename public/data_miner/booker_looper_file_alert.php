@@ -1,7 +1,7 @@
 <?php
 include_once("helper.php");
 function bookerLooperFileAlert(){
-  $dir = '/var/www/html/rumble-boxing.com/booker_looper/';
+  $dir = '/var/www/html2/rumble-scripts/public/booker_looper/';
   $filename = 'booker_looper.txt';
   $file = $dir.$filename;
   $filemtime = filemtime($file);
@@ -28,14 +28,21 @@ function bookerLooperFileAlert(){
       // <p>File: ".getDateFromTime($filemtime)."</p>
       // ";
       mailer(
-        ['support@arcanestrategies.com','chris.merritt-lish@rumble-boxing.com'],'URGENT: Class Reopener Failing',$content);
+        ['support@arcanestrategies.com'],'Medium Priority: Rumble Class Reopener Failing',$content);
     }
   }
 }
 
 function attendanceTodayAlert(){
   $dir = '/var/www/html2/rumble-scripts/zflogs/attendance/';
-  $locations = ['FlatironChelsea','NoHo'];
+  $locations = ['FlatironChelsea','NoHo','UESStudio4','FiDi','WeHo','RumbleDC','CenterCity','Brooklyn',
+		'TribecaBoxing',
+		'PaloAltoBoxing',
+		'FlatironChelseaTraining',
+		'MarinaTraining',
+		//'MarinaBoxing',
+		//'UESTraining',
+		];
   foreach($locations as $location){
 	$filename = 'attendance_'.$location.'_today.csv';
 	  $file = $dir.$filename;
@@ -48,7 +55,7 @@ function attendanceTodayAlert(){
 		$check = true;
 		$content = "<p>ZingFit threw an error attempting to export the daily attendance report for $location.  This means that the Class Map/Calendar might have outdated enrollment numbers.  The last successful run was at: $filemtime.  The next run is within 15 minutes</p>";
 		//mailer(['support@arcanestrategies.com','chris.merritt-lish@rumble-boxing.com'],'WARNING: ZingFit Error on '.$location.' Daily Attendance Report',$content);
-		mailer(['michael.ricotta@gmail.com'],'WARNING: ZingFit Error on '.$location.' Daily Attendance Report',$content);
+		mailer(['support@arcanestrategies.com'],'WARNING: ZingFit Error on '.$location.' Daily Attendance Report',$content);
 	  }
   }
 }

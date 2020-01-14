@@ -57,7 +57,7 @@ var currentYearFull = new Date().getFullYear().toString();			// Gets full year
 var currentYear = currentYearFull.substr(-2);						// Gets 2 digit year
 var eom = new Date(currentYearFull, currentMonth, 0).toString().substr(8,2);	// end of this month
 var eolm = new Date(currentYearFull, lastMonth, 0).toString().substr(8,2);		// end of last month
-var regions = ['12900000002','12900000004','751454502594283131','844951477611922822','844951479021209042'];
+var regions = {'1290000000':'12900000002','12900000002':'12900000004','751454502409733751':'751454502594283131','844951477452539266':'844951477611922822','844951479012820430':'844951479021209042'};
 var bookerUrl = 'https://rumble.zingfitstudio.com/index.cfm?action=Booker.view';
 var months = ['1','2','3','4','5','6','7','8','9','10','11','12'];
 
@@ -111,22 +111,31 @@ casper.then(function(){
 });
 
 casper.then(function(){
-	/*casper.each(regions, function(self, rgn){
+        Object.keys(regions).forEach(function(key){
+                var rgn = regions[key];
 		var setRegion = adminer+'index.cfm?action=Register.setSite&siteid='+rgn+'&returnurl=%2Findex%2Ecfm%3Faction%3DReport%2Edashboard';
 		casper.thenOpen(setRegion, function(){
 			this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');		
 		});
 		casper.then(function(){
-			if(rgn == '12900000002') { 
-				var loc = 'NY';
-			} else if(rgn == '12900000004') { 
-				var loc = 'LA';
-			} else { 
-				var loc = 'NY';
-			}*/
 			var index = 'FirstTime';
-			var identifier = '12900000006';
-			var filename = logs+'revenue/RevenueReport_'+index+'_'+identifier+'.csv';
+			if(self == '12900000002'){	// LA
+				var identifier = '642891123567625433';
+				var loc = 'LA';
+			} else if(key == '751454502409733751'){	// SF
+				var identifier = '763632640518522700';
+				var loc = 'SF';
+			} else if(key == '844951477452539266'){	// PA
+				var identifier = '846277506662139187';
+				var loc = 'PA';
+			} else if(key == '844951479012820430'){	// DC
+				var identifier = '847665778655233080';
+				var loc = 'DC';
+			} else {	// Default is NYC
+				var identifier = '12900000006';
+				var loc = 'NY';
+			}
+			var filename = logs+'revenue/RevenueReport_'+index+'_'+loc+'_'+identifier+'.csv';
 			var string = '';
 			var header_string = '';
 			fs.write(filename, string, 'w');
@@ -189,8 +198,8 @@ casper.then(function(){
 					});
 				});
 			}
-		/*});
-	});*/
+		});
+	});
 });
 
 casper.run(function(){
