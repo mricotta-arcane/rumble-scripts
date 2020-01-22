@@ -6,8 +6,7 @@ function bookerLooperFileAlert(){
   $file = $dir.$filename;
   $filemtime = filemtime($file);
   $current = time();
-  $checkHour = $current-2*60*60;
-  // $checkHour = $current-15*60;
+  $checkHour = $current-3*60*60;
   $check = false;
   $lastRow = $successtime = '';
   $lastRowArray = [];
@@ -48,7 +47,7 @@ function attendanceTodayAlert(){
 	  $file = $dir.$filename;
 	  $filemtime = filemtime($file);
 	  $current = time();
-	  $checkHour = $current-30**60;
+	  $checkHour = $current-30*60;
 	  $check = false;
 	  $successtime = '';
 	  if($filemtime<$checkHour){
