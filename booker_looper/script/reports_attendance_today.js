@@ -162,7 +162,9 @@ casper.then(function() {
 
 casper.then(function() {
   // This is all 3 of the class attendance reports
-  Object.keys(attendanceReports).forEach(function(index) {
+  this.eachThen(Object.keys(attendanceReports), function(res) {
+    var index = res.data;
+    this.echo("Starting: " + index + " at: " + new Date());
     //  For each of the attendance reports, execute for this current entire year.
     var identifier = attendanceReports[index];
     var regionselector = roomsRegions[identifier];
@@ -171,7 +173,7 @@ casper.then(function() {
       "index.cfm?action=Register.setSite&siteid=" +
       regionselector +
       "&returnurl=%2Findex%2Ecfm%3Faction%3DReport%2Edashboard";
-    casper.thenOpen(setRegion, function() {
+    this.thenOpen(setRegion, function() {
       this.waitForUrl(
         "https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard"
       );
@@ -182,8 +184,8 @@ casper.then(function() {
       var startdate = "7%2F1%2F";
       var enddate = "12%2F31%2F";
     }*/
-    casper.thenOpen(
-      attendanceReportURL +
+    this.thenOpen(
+        attendanceReportURL +
         /*identifier +
         "&start=" +
         startdate +
@@ -204,48 +206,52 @@ casper.then(function() {
         currentDate +
         "%2F" +
         currentYear,
-      function() {}
+        function() {}
     );
-    casper.then(function() {
-      var reporttoday =
-        attendanceReportURL +
-        identifier +
-        "&start=" +
-        currentMonth +
-        "%2F" +
-        currentDate +
-        "%2F" +
-        currentYear +
-        "&end=" +
-        currentMonth +
-        "%2F" +
-        currentDate +
-        "%2F" +
-        currentYear +
-        "&export=csv";
-      // Get "today" data
-      casper.download(
-        reporttoday,
-        logs + "attendance/attendance_" + index + "_today.tmp.csv"
-      );
-      // Only store today data if it is valid
-      var fileSizeInBytes = fs.size(
-        logs + "attendance/attendance_" + index + "_today.tmp.csv"
-      );
-      var contents = fs.read(
-        logs + "attendance/attendance_" + index + "_today.tmp.csv"
-      );
-      var substr = contents.indexOf("System Error");
-      if (fileSizeInBytes > 200 && substr == -1) {
-        // if filesize is greater than 500 and does not contain string
-        if (fs.exists(logs + "attendance/attendance_" + index + "_today.csv")) {
-          fs.remove(logs + "attendance/attendance_" + index + "_today.csv");
-        }
-        fs.move(
-          logs + "attendance/attendance_" + index + "_today.tmp.csv",
-          logs + "attendance/attendance_" + index + "_today.csv"
+
+    this.then(function() {
+      this.wait(30000, function() {
+        var reporttoday =
+            attendanceReportURL +
+            identifier +
+            "&start=" +
+            currentMonth +
+            "%2F" +
+            currentDate +
+            "%2F" +
+            currentYear +
+            "&end=" +
+            currentMonth +
+            "%2F" +
+            currentDate +
+            "%2F" +
+            currentYear +
+            "&export=csv";
+        // Get "today" data
+        //casper.download(
+        this.download(
+            reporttoday,
+            logs + "attendance/attendance_" + index + "_today.tmp.csv"
         );
-      }
+        // Only store today data if it is valid
+        var fileSizeInBytes = fs.size(
+            logs + "attendance/attendance_" + index + "_today.tmp.csv"
+        );
+        var contents = fs.read(
+            logs + "attendance/attendance_" + index + "_today.tmp.csv"
+        );
+        var substr = contents.indexOf("System Error");
+        if (fileSizeInBytes > 200 && substr == -1) {
+          // if filesize is greater than 500 and does not contain string
+          if (fs.exists(logs + "attendance/attendance_" + index + "_today.csv")) {
+            fs.remove(logs + "attendance/attendance_" + index + "_today.csv");
+          }
+          fs.move(
+              logs + "attendance/attendance_" + index + "_today.tmp.csv",
+              logs + "attendance/attendance_" + index + "_today.csv"
+          );
+        }
+      });
     });
   });
 });
