@@ -176,20 +176,33 @@ casper.then(function() {
         "https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard"
       );
     });
-    var startdate = "1%2F1%2F";
+    /*var startdate = "1%2F1%2F";
     var enddate = "6%2F30%2F";
     if (currentMonth > 6) {
       var startdate = "7%2F1%2F";
       var enddate = "12%2F31%2F";
-    }
+    }*/
     casper.thenOpen(
       attendanceReportURL +
-        identifier +
+        /*identifier +
         "&start=" +
         startdate +
         currentYear +
         "&end=" +
         enddate +
+        currentYear,*/
+        identifier +
+        "&start=" +
+        currentMonth +
+        "%2F" +
+        currentDate +
+        "%2F" +
+        currentYear +
+        "&end=" +
+        currentMonth +
+        "%2F" +
+        currentDate +
+        "%2F" +
         currentYear,
       function() {}
     );
