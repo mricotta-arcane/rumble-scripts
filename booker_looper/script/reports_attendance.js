@@ -14,6 +14,18 @@ var casper = require("casper").create({
   }
 });
 
+function getQuarter() {
+  var currentMonth = new Date().getMonth();
+  return Math.floor((currentMonth + 3) / 3);
+}
+
+var dates = {
+  1: {startDate: '1%2F1%2F', endDate: '3%2F31%2F'},
+  2: {startDate: '3%2F1%2F', endDate: '6%2F30%2F'},
+  3: {startDate: '6%2F1%2F', endDate: '9%2F30%2F'},
+  4: {startDate: '9%2F1%2F', endDate: '12%2F31%2F'},
+};
+
 // var path = fs.absolute('');
 var path = casper.cli.get("path");
 if (typeof path === "undefined") {
@@ -178,7 +190,9 @@ casper.then(function() {
 
 casper.then(function() {
   // This is all 3 of the class attendance reports
-  Object.keys(attendanceReports).forEach(function(index) {
+  this.eachThen(Object.keys(attendanceReports), function(res) {
+    var index = res.data;
+    this.echo("Starting: " + index + " at: " + new Date());
     //  For each of the attendance reports, execute for this current entire year.
     var identifier = attendanceReports[index];
     var regionselector = roomsRegions[identifier];
@@ -187,12 +201,12 @@ casper.then(function() {
       "index.cfm?action=Register.setSite&siteid=" +
       regionselector +
       "&returnurl=%2Findex%2Ecfm%3Faction%3DReport%2Edashboard";
-    casper.thenOpen(setRegion, function() {
+    this.thenOpen(setRegion, function() {
       this.waitForUrl(
         "https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard"
       );
     });
-    casper.thenOpen(
+    this.thenOpen(
       attendanceReportURL +
         identifier +
         "&start=7%2F1%2F" +
@@ -201,97 +215,92 @@ casper.then(function() {
         currentYear,
       function() {}
     );
-    casper.then(function() {
-      var startdate = "1%2F1%2F";
-      var enddate = "6%2F30%2F";
-      var hlf = "1";
-      if (currentMonth > 6) {
-        var startdate = "7%2F1%2F";
-        var enddate = "12%2F31%2F";
-        var hlf = "2";
-      }
-      var reportpage =
-        attendanceReportURL +
-        identifier +
-        "&start=" +
-        startdate +
-        currentYear +
-        "&end=" +
-        enddate +
-        currentYear +
-        "&export=csv";
-      var reporttoday =
-        attendanceReportURL +
-        identifier +
-        "&start=" +
-        currentMonth +
-        "%2F" +
-        currentDate +
-        "%2F" +
-        currentYear +
-        "&end=" +
-        currentMonth +
-        "%2F" +
-        currentDate +
-        "%2F" +
-        currentYear +
-        "&export=csv";
-      //casper.download(reportpage,logs+"attendance/attendance_"+index+"_"+currentMonth+"-"+currentYear+".csv");
-      // Get full year data
-      casper.download(
-        reportpage,
-        logs +
-          "attendance/attendance_" +
-          index +
-          "_" +
-          currentYear +
-          "-" +
-          hlf +
-          ".tmp.csv"
-      );
-      // Get "today" data
-      casper.download(
-        reporttoday,
-        logs + "attendance/attendance_" + index + "_today.tmp.csv"
-      );
-      // Only store full year data if it is valid
-      var fileSizeInBytes = fs.size(
-        logs +
-          "attendance/attendance_" +
-          index +
-          "_" +
-          currentYear +
-          "-" +
-          hlf +
-          ".tmp.csv"
-      );
-      var contents = fs.read(
-        logs +
-          "attendance/attendance_" +
-          index +
-          "_" +
-          currentYear +
-          "-" +
-          hlf +
-          ".tmp.csv"
-      );
-      var substr = contents.indexOf("System Error");
-      if (fileSizeInBytes > 200 && substr == -1) {
-        // if filesize is greater than 500 and does not contain string
-        if (
-          fs.exists(
+    this.then(function() {
+      this.wait(30000, function(){
+        var hlf = getQuarter();
+        var startdate = dates[hlf].startDate;
+        var enddate = dates[hlf].endDate;
+        var reportpage =
+            attendanceReportURL +
+            identifier +
+            "&start=" +
+            startdate +
+            currentYear +
+            "&end=" +
+            enddate +
+            currentYear +
+            "&export=csv";
+        //casper.download(reportpage,logs+"attendance/attendance_"+index+"_"+currentMonth+"-"+currentYear+".csv");
+        // Get full year data
+        casper.download(
+            reportpage,
             logs +
+            "attendance/attendance_" +
+            index +
+            "_" +
+            currentYear +
+            "-" +
+            hlf +
+            ".tmp.csv"
+        );
+
+        // Only store full year data if it is valid
+        var fileSizeInBytes = fs.size(
+            logs +
+            "attendance/attendance_" +
+            index +
+            "_" +
+            currentYear +
+            "-" +
+            hlf +
+            ".tmp.csv"
+        );
+        var contents = fs.read(
+            logs +
+            "attendance/attendance_" +
+            index +
+            "_" +
+            currentYear +
+            "-" +
+            hlf +
+            ".tmp.csv"
+        );
+        var substr = contents.indexOf("System Error");
+        if (fileSizeInBytes > 200 && substr == -1) {
+          // if filesize is greater than 500 and does not contain string
+          if (
+              fs.exists(
+                  logs +
+                  "attendance/attendance_" +
+                  index +
+                  "_" +
+                  currentYear +
+                  "-" +
+                  hlf +
+                  ".csv"
+              )
+          ) {
+            fs.remove(
+                logs +
+                "attendance/attendance_" +
+                index +
+                "_" +
+                currentYear +
+                "-" +
+                hlf +
+                ".csv"
+            );
+          }
+          fs.move(
+              logs +
               "attendance/attendance_" +
               index +
               "_" +
               currentYear +
               "-" +
               hlf +
-              ".csv"
-          )
-        ) {
-          fs.remove(
-            logs +
+              ".tmp.csv",
+              logs +
               "attendance/attendance_" +
               index +
               "_" +
@@ -301,43 +310,7 @@ casper.then(function() {
               ".csv"
           );
         }
-        fs.move(
-          logs +
-            "attendance/attendance_" +
-            index +
-            "_" +
-            currentYear +
-            "-" +
-            hlf +
-            ".tmp.csv",
-          logs +
-            "attendance/attendance_" +
-            index +
-            "_" +
-            currentYear +
-            "-" +
-            hlf +
-            ".csv"
-        );
-      }
-      // Only store today data if it is valid
-      var fileSizeInBytes = fs.size(
-        logs + "attendance/attendance_" + index + "_today.tmp.csv"
-      );
-      var contents = fs.read(
-        logs + "attendance/attendance_" + index + "_today.tmp.csv"
-      );
-      var substr = contents.indexOf("System Error");
-      if (fileSizeInBytes > 200 && substr == -1) {
-        // if filesize is greater than 500 and does not contain string
-        if (fs.exists(logs + "attendance/attendance_" + index + "_today.csv")) {
-          fs.remove(logs + "attendance/attendance_" + index + "_today.csv");
-        }
-        fs.move(
-          logs + "attendance/attendance_" + index + "_today.tmp.csv",
-          logs + "attendance/attendance_" + index + "_today.csv"
-        );
-      }
+      });
     });
   });
 });
