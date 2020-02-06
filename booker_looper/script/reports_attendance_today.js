@@ -253,6 +253,11 @@ casper.then(function() {
 
           if (fs.exists(logs + "attendance/attendance_" + index + "_today.csv")){
             var date_string = (new Date()).toISOString().split('T')[0];
+
+            if (fs.exists(logs + "attendance/attendance_" + index + "_" + date_string + ".csv")) {
+              fs.remove(logs + "attendance/attendance_" + index + "_" + date_string + ".csv");
+            }
+
             fs.copy(
                 logs + "attendance/attendance_" + index + "_today.csv",
                 logs + "attendance/attendance_" + index + "_" + date_string + ".csv"
