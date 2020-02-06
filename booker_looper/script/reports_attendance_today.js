@@ -248,7 +248,16 @@ casper.then(function() {
           }
           fs.move(
               logs + "attendance/attendance_" + index + "_today.tmp.csv",
-              logs + "attendance/attendance_" + index + "_today.csv"
+              logs + "attendance/attendance_" + index + "_today.csv",
+              function() {
+                if (fs.exists(logs + "attendance/attendance_" + index + "_today.csv")){
+                  var date_string = (new Date()).toISOString().split('T')[0];
+                  fs.copyFile(
+                      logs + "attendance/attendance_" + index + "_today.csv",
+                      logs + "attendance/attendance_" + index + "_" + date_string + ".csv"
+                  );
+                }
+              }
           );
         }
       });
