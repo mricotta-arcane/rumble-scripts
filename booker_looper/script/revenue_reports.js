@@ -234,67 +234,71 @@ casper.then(function(){
 			} else { 
 				var loc = 'NY';
 			}*/
-			Object.keys(revenueReportsAll).forEach(function(index){	
+			this.eachThen(Object.keys(revenueReportsAll), function(res){
+				var index = res.data;
 				var identifier = revenueReportsAll[index];
+				this.echo("Starting: " + index + "-" + identifier + " at: " + new Date());
 				var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+index+'&start=1%2F1%2F'+currentYear+'&end=12%2F31%2F'+currentYear;
 				var filename = logs+'revenue/RevenueReport_'+index+'_'+identifier+'.csv';
 				if(index == 'FirstTime'){
 					var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+index+'&start='+currentMonth+'%2F1%2F'+currentYear+'&end='+currentMonth+'%2F'+eom+'%2F'+currentYear;
 					var filename = logs+'revenue/RevenueReport_'+index+'_'+identifier+'_this-month-src.csv';
 				}
-				casper.thenOpen(revenueURL, function(){
-					//this.clearCache();
-					//this.clearMemoryCache();
-					var header_string = '';
-					this.waitForSelector('table.table-bordered thead', function() {
-						var headers = casper.evaluate(function() {
-							return document.querySelector('table.table-bordered thead');
-						});
-						this.wait(4000,function(){
-							if (typeof headers !== 'undefined') {
-								var hdr = casper.evaluate(function(cssSelector){
-									var st = '';
-									__utils__.findAll(cssSelector).forEach(function(el){
-										st += '"'+el.textContent.trim()+'",';
-										console.log('header: '+st);
-									});
-									return st;
-								}, 'table.table-bordered thead tr:nth-child(2) th');
-								header_string = hdr+'\r\n';
-							} else {
-								console.log('table undefined');
-							}
-						});
-					});
-					this.waitForSelector('table.table-bordered tbody', function() {
-						var table = casper.evaluate(function() {
-							return document.querySelector('table.table-bordered tbody');
-						});
-						this.wait(10000,function(){
-							if (typeof table !== 'undefined') {
-								var tr = this.evaluate(function() {
-									return document.querySelectorAll('table.table-bordered tbody tr').length;
-								});
-								//console.log('tr length '+tr);
-								var string = '';
-								var i = 0;
-								var j = 0;
-								for (i = 0; i < tr; ++i) {
-									var cell = casper.evaluate(function(cssSelector){
-										var str = '';
+				this.thenOpen(revenueURL, function(){
+					this.wait(30000, function (){
+						//this.clearCache();
+						//this.clearMemoryCache();
+						var header_string = '';
+						this.waitForSelector('table.table-bordered thead', function() {
+							var headers = casper.evaluate(function() {
+								return document.querySelector('table.table-bordered thead');
+							});
+							this.wait(4000,function(){
+								if (typeof headers !== 'undefined') {
+									var hdr = casper.evaluate(function(cssSelector){
+										var st = '';
 										__utils__.findAll(cssSelector).forEach(function(el){
-											str += '"'+el.textContent.trim()+'",';
+											st += '"'+el.textContent.trim()+'",';
+											console.log('header: '+st);
 										});
-										return str;
-									}, 'table.table-bordered tbody tr:nth-child('+i+') td');
-									//console.log(cell);
-									string += cell+'\r\n';
-								};
-								string = header_string+string;
-								fs.write(filename, string, 'w');
-							} else {
-								console.log('table undefined');
-							}
+										return st;
+									}, 'table.table-bordered thead tr:nth-child(2) th');
+									header_string = hdr+'\r\n';
+								} else {
+									console.log('table undefined');
+								}
+							});
+						});
+						this.waitForSelector('table.table-bordered tbody', function() {
+							var table = casper.evaluate(function() {
+								return document.querySelector('table.table-bordered tbody');
+							});
+							this.wait(10000,function(){
+								if (typeof table !== 'undefined') {
+									var tr = this.evaluate(function() {
+										return document.querySelectorAll('table.table-bordered tbody tr').length;
+									});
+									//console.log('tr length '+tr);
+									var string = '';
+									var i = 0;
+									var j = 0;
+									for (i = 0; i < tr; ++i) {
+										var cell = casper.evaluate(function(cssSelector){
+											var str = '';
+											__utils__.findAll(cssSelector).forEach(function(el){
+												str += '"'+el.textContent.trim()+'",';
+											});
+											return str;
+										}, 'table.table-bordered tbody tr:nth-child('+i+') td');
+										//console.log(cell);
+										string += cell+'\r\n';
+									};
+									string = header_string+string;
+									fs.write(filename, string, 'w');
+								} else {
+									console.log('table undefined');
+								}
+							});
 						});
 					});
 				});
