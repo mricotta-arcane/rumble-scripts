@@ -57,7 +57,7 @@ var currentYearFull = new Date().getFullYear().toString();			// Gets full year
 var currentYear = currentYearFull.substr(-2);						// Gets 2 digit year
 var eom = new Date(currentYearFull, currentMonth, 0).toString().substr(8,2);	// end of this month
 var eolm = new Date(currentYearFull, lastMonth, 0).toString().substr(8,2);		// end of last month
-var regions = {'1290000000':'12900000002','12900000002':'12900000004','751454502409733751':'751454502594283131','844951477452539266':'844951477611922822','844951479012820430':'844951479021209042'};
+var regions = {'1290000001':'12900000002','12900000002':'12900000004','751454502351013494':'751454502594283131','844951477418984833':'844951477611922822','844951479012820429':'844951479021209042'};
 var bookerUrl = 'https://rumble.zingfitstudio.com/index.cfm?action=Booker.view';
 var months = ['1','2','3','4','5','6','7','8','9','10','11','12'];
 
@@ -113,6 +113,7 @@ casper.then(function(){
 casper.then(function(){
         this.eachThen(Object.keys(regions), function(res){
         	var key = res.data;
+		console.log(key);
         	var rgn = regions[key];
 			var setRegion = adminer+'index.cfm?action=Register.setSite&siteid='+rgn+'&returnurl=%2Findex%2Ecfm%3Faction%3DReport%2Edashboard';
 			this.thenOpen(setRegion, function(){
@@ -121,16 +122,16 @@ casper.then(function(){
 			this.then(function(){
 				this.wait(30000, function () {
 					var index = 'FirstTime';
-					if(self == '12900000002'){	// LA
+					if(key == '12900000002'){	// LA
 						var identifier = '642891123567625433';
 						var loc = 'LA';
-					} else if(key == '751454502409733751'){	// SF
+					} else if(key == '751454502351013494'){	// SF
 						var identifier = '763632640518522700';
 						var loc = 'SF';
-					} else if(key == '844951477452539266'){	// PA
+					} else if(key == '844951477418984833'){	// PA
 						var identifier = '846277506662139187';
 						var loc = 'PA';
-					} else if(key == '844951479012820430'){	// DC
+					} else if(key == '844951479012820429'){	// DC
 						var identifier = '847665778655233080';
 						var loc = 'DC';
 					} else {	// Default is NYC

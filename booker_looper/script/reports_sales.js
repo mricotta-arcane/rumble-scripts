@@ -118,8 +118,11 @@ casper.then(function() {
 });
 
 casper.then(function() {
-  this.eachThen(regions, function(self, rgn) {
+	var i = 0;
+  this.eachThen(regions, function(rgn) {
     this.wait(30000, function() {
+	var rgn = regions[i];
+	i++;
       var setRegion =
           adminer +
           "index.cfm?action=Register.setSite&siteid=" +
