@@ -111,94 +111,97 @@ casper.then(function(){
 });
 
 casper.then(function(){
-        Object.keys(regions).forEach(function(key){
-                var rgn = regions[key];
-		var setRegion = adminer+'index.cfm?action=Register.setSite&siteid='+rgn+'&returnurl=%2Findex%2Ecfm%3Faction%3DReport%2Edashboard';
-		casper.thenOpen(setRegion, function(){
-			this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');		
-		});
-		casper.then(function(){
-			var index = 'FirstTime';
-			if(self == '12900000002'){	// LA
-				var identifier = '642891123567625433';
-				var loc = 'LA';
-			} else if(key == '751454502409733751'){	// SF
-				var identifier = '763632640518522700';
-				var loc = 'SF';
-			} else if(key == '844951477452539266'){	// PA
-				var identifier = '846277506662139187';
-				var loc = 'PA';
-			} else if(key == '844951479012820430'){	// DC
-				var identifier = '847665778655233080';
-				var loc = 'DC';
-			} else {	// Default is NYC
-				var identifier = '12900000006';
-				var loc = 'NY';
-			}
-			var filename = logs+'revenue/RevenueReport_'+index+'_'+loc+'_'+identifier+'.csv';
-			var string = '';
-			var header_string = '';
-			fs.write(filename, string, 'w');
-			for(var i = 0, len = months.length; i < len; i++){
-				var eotm = new Date(currentYearFull, months[i], 0).toString().substr(8,2);	// end of this month
-				var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+identifier+'&start='+months[i]+'%2F1%2F'+currentYear+'&end='+months[i]+'%2F'+eotm+'%2F'+currentYear;
-				casper.thenOpen(revenueURL, function(){
-					if(header_string.length == 0){
-						this.waitForSelector('table.table-bordered thead', function() {
-							var headers = casper.evaluate(function() {
-								return document.querySelector('table.table-bordered thead');
-							});
-							this.wait(4000,function(){
-								if (typeof headers !== 'undefined') {
-									var hdr = casper.evaluate(function(cssSelector){
-										var st = '';
-										__utils__.findAll(cssSelector).forEach(function(el){
-											st += '"'+el.textContent.trim()+'",';
-											console.log('header: '+st);
+        this.eachThen(Object.keys(regions), function(res){
+        	var key = res.data;
+        	var rgn = regions[key];
+			var setRegion = adminer+'index.cfm?action=Register.setSite&siteid='+rgn+'&returnurl=%2Findex%2Ecfm%3Faction%3DReport%2Edashboard';
+			this.thenOpen(setRegion, function(){
+				this.waitForUrl('https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard');
+			});
+			this.then(function(){
+				this.wait(30000, function () {
+					var index = 'FirstTime';
+					if(self == '12900000002'){	// LA
+						var identifier = '642891123567625433';
+						var loc = 'LA';
+					} else if(key == '751454502409733751'){	// SF
+						var identifier = '763632640518522700';
+						var loc = 'SF';
+					} else if(key == '844951477452539266'){	// PA
+						var identifier = '846277506662139187';
+						var loc = 'PA';
+					} else if(key == '844951479012820430'){	// DC
+						var identifier = '847665778655233080';
+						var loc = 'DC';
+					} else {	// Default is NYC
+						var identifier = '12900000006';
+						var loc = 'NY';
+					}
+					var filename = logs+'revenue/RevenueReport_'+index+'_'+loc+'_'+identifier+'.csv';
+					var string = '';
+					var header_string = '';
+					fs.write(filename, string, 'w');
+					for(var i = 0, len = months.length; i < len; i++){
+						var eotm = new Date(currentYearFull, months[i], 0).toString().substr(8,2);	// end of this month
+						var revenueURL = reportURL+'earnedSeriesRevenueDetail&type=series&gatewayid=12900000001&seriesid='+identifier+'&start='+months[i]+'%2F1%2F'+currentYear+'&end='+months[i]+'%2F'+eotm+'%2F'+currentYear;
+						this.thenOpen(revenueURL, function(){
+							if(header_string.length == 0){
+								this.waitForSelector('table.table-bordered thead', function() {
+									var headers = this.evaluate(function() {
+										return document.querySelector('table.table-bordered thead');
+									});
+									this.wait(4000,function(){
+										if (typeof headers !== 'undefined') {
+											var hdr = this.evaluate(function(cssSelector){
+												var st = '';
+												__utils__.findAll(cssSelector).forEach(function(el){
+													st += '"'+el.textContent.trim()+'",';
+													console.log('header: '+st);
+												});
+												return st;
+											}, 'table.table-bordered thead tr:nth-child(2) th');
+											header_string = hdr+'\r\n';
+										} else {
+											console.log('table undefined');
+										}
+									});
+								});
+							}
+							var string = '';
+							this.waitForSelector('table.table-bordered tbody', function() {
+								var table = casper.evaluate(function() {
+									return document.querySelector('table.table-bordered tbody');
+								});
+								this.wait(4000,function(){
+									if (typeof table !== 'undefined') {
+										var tr = this.evaluate(function() {
+											return document.querySelectorAll('table.table-bordered tbody tr').length;
 										});
-										return st;
-									}, 'table.table-bordered thead tr:nth-child(2) th');
-									header_string = hdr+'\r\n';
-								} else {
-									console.log('table undefined');
-								}
+										//console.log('tr length '+tr);
+										var i = 0;
+										var j = 0;
+										for (i = 0; i < tr; ++i) {
+											var cell = casper.evaluate(function(cssSelector){
+												var str = '';
+												__utils__.findAll(cssSelector).forEach(function(el){
+													str += '"'+el.textContent.trim()+'",';
+												});
+												return str;
+											}, 'table.table-bordered tbody tr:nth-child('+i+') td');
+											//console.log(cell);
+											string += cell+'\r\n';
+										};
+										string = header_string+string;
+										fs.write(filename, string, 'a');
+									} else {
+										console.log('table undefined');
+									}
+								});
 							});
 						});
 					}
-					var string = '';
-					this.waitForSelector('table.table-bordered tbody', function() {
-						var table = casper.evaluate(function() {
-							return document.querySelector('table.table-bordered tbody');
-						});
-						this.wait(4000,function(){
-							if (typeof table !== 'undefined') {
-								var tr = this.evaluate(function() {
-									return document.querySelectorAll('table.table-bordered tbody tr').length;
-								});
-								//console.log('tr length '+tr);
-								var i = 0;
-								var j = 0;
-								for (i = 0; i < tr; ++i) {
-									var cell = casper.evaluate(function(cssSelector){
-										var str = '';
-										__utils__.findAll(cssSelector).forEach(function(el){
-											str += '"'+el.textContent.trim()+'",';
-										});
-										return str;
-									}, 'table.table-bordered tbody tr:nth-child('+i+') td');
-									//console.log(cell);
-									string += cell+'\r\n';
-								};
-								string = header_string+string;
-								fs.write(filename, string, 'a');
-							} else {
-								console.log('table undefined');
-							}
-						});
-					});
 				});
-			}
-		});
+			});
 	});
 });
 
