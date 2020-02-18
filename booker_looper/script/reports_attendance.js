@@ -206,7 +206,7 @@ casper.then(function() {
         "https://rumble.zingfitstudio.com/index.cfm?action=Report.dashboard"
       );
     });
-    this.thenOpen(
+    /*this.thenOpen(
       attendanceReportURL +
         identifier +
         "&start=7%2F1%2F" +
@@ -214,7 +214,7 @@ casper.then(function() {
         "&end=12%2F31%2F" +
         currentYear,
       function() {}
-    );
+    );*/
     this.then(function() {
       this.wait(30000, function(){
         var hlf = getQuarter();
