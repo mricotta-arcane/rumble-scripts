@@ -89,7 +89,7 @@ class ProductUpdater{
 	  $METHOD = 'POST';
 	  $CALL = '/admin/products/search';
 	  //$CALL = '/admin/products/'.$PRODUCT_ID.'/variants';
-	  //$this->API_KEY = 'mricotta@arcanestrategies.com';
+	  //$this->API_KEY = 'mricotta@doyourumble.com';
 	  //$this->PASSWORD = 'Rumbl3';
 	  $url = self::setURL($CALL);
 	  $url = $url.'?query=sku:'.$sku;

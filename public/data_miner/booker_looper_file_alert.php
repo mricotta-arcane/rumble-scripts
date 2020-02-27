@@ -27,7 +27,7 @@ function bookerLooperFileAlert(){
       // <p>File: ".getDateFromTime($filemtime)."</p>
       // ";
       mailer(
-        ['support@arcanestrategies.com'],'Medium Priority: Rumble Class Reopener Failing',$content);
+        ['alerts@doyourumble.com'],'Medium Priority: Rumble Class Reopener Failing',$content);
     }
   }
 }
@@ -53,8 +53,8 @@ function attendanceTodayAlert(){
 	  if($filemtime<$checkHour){
 		$check = true;
 		$content = "<p>ZingFit threw an error attempting to export the daily attendance report for $location.  This means that the Class Map/Calendar might have outdated enrollment numbers.  The last successful run was at: $filemtime.  The next run is within 15 minutes</p>";
-		//mailer(['support@arcanestrategies.com','chris.merritt-lish@rumble-boxing.com'],'WARNING: ZingFit Error on '.$location.' Daily Attendance Report',$content);
-		mailer(['support@arcanestrategies.com'],'WARNING: ZingFit Error on '.$location.' Daily Attendance Report',$content);
+		//mailer(['support@doyourumble.com','chris.merritt-lish@rumble-boxing.com'],'WARNING: ZingFit Error on '.$location.' Daily Attendance Report',$content);
+		mailer(['alerts@doyourumble.com'],'WARNING: ZingFit Error on '.$location.' Daily Attendance Report',$content);
 	  }
   }
 }

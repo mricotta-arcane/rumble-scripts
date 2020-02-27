@@ -50,8 +50,8 @@
         <h1>Locations</h1>
         <div class="">
           <a href="getzip.php" class="btn btn-success noform">Download all CSV ZIP</a>
-          <a href="http://rumble-script.arcanestrategies.com/data_miner/log/scraper_summary.csv" class="btn btn-success noform">Download Summary</a>
-          <a href="http://rumble-script.arcanestrategies.com/data_miner/log/class_summary.csv" class="btn btn-success noform">Download Class Summary</a>
+          <a href="http://rumble-script.doyourumble.com/data_miner/log/scraper_summary.csv" class="btn btn-success noform">Download Summary</a>
+          <a href="http://rumble-script.doyourumble.com/data_miner/log/class_summary.csv" class="btn btn-success noform">Download Class Summary</a>
           <a href="#" class="btn btn-success noform" data-action="modal" data-modalbody="locationmodal.php" data-modalid="addLocationModal">Add Location</a>
           <!-- <a href="getlocations.php" class="btn btn-success noform">Get locations</a> -->
         </div>
@@ -97,10 +97,10 @@
                   <a href="<?php echo getUrl($studio); ?>" target="_blank">
                     <?php echo $studio->name ?>
                   </a>
-                  <!-- http://rumble-script.arcanestrategies.com/data_miner/log/scraper_day_soulcycle_1023.csv -->
+                  <!-- http://rumble-script.doyourumble.com/data_miner/log/scraper_day_soulcycle_1023.csv -->
                   <div class="">
-                    <a class="btn btn-xs btn-default" href="http://rumble-script.arcanestrategies.com/data_miner/log/scraper_day_<?php echo getSite($studio) ?>_<?php echo $studio->studio_id ?>.csv" target="_blank">Daily CSV</a>
-                    <a class="btn btn-xs btn-default" href="http://rumble-script.arcanestrategies.com/data_miner/log/scraper_week_<?php echo getSite($studio) ?>_<?php echo $studio->studio_id ?>.csv" target="_blank">Weekly CSV</a>
+                    <a class="btn btn-xs btn-default" href="http://rumble-script.doyourumble.com/data_miner/log/scraper_day_<?php echo getSite($studio) ?>_<?php echo $studio->studio_id ?>.csv" target="_blank">Daily CSV</a>
+                    <a class="btn btn-xs btn-default" href="http://rumble-script.doyourumble.com/data_miner/log/scraper_week_<?php echo getSite($studio) ?>_<?php echo $studio->studio_id ?>.csv" target="_blank">Weekly CSV</a>
                   </div>
 
                 </td>

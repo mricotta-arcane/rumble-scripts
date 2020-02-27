@@ -188,7 +188,7 @@ function mailer($to,$subject,$content,$cc=null){
   //         "name": "Jane Doe"
   //       }
   //     ],
-  //   $cc = 'support@arcanestrategies.com';
+  //   $cc = 'support@doyourumble.com';
   // }
   if (is_array($to)){
     foreach ($to as $t) {
@@ -208,7 +208,7 @@ function mailer($to,$subject,$content,$cc=null){
       ]
     ],
     "from"=> [
-      "email"=> "rumble@arcanestrategies.com",
+      "email"=> "rumble@doyourumble.com",
       "name"=> "Arcane Strategies | Rumble"
     ],
     "subject"=> $subject,

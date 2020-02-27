@@ -80,15 +80,15 @@ class Mailer
     }
     //$to = 'contact@rumble-boxing.com';
     // $to = 'michael.ricotta@gmail.com';
-    $to = 'alert@arcanestrategies.com';
+    $to = 'alert@doyourumble.com';
     $subject = 'URGENT - '.$this->class.' ON '.$this->datetime.' REOPENED';
     $body = 'Please check this class to ensure the waitlist is added if outside of 12 hours from the class time.';
     $headers =  'MIME-Version: 1.0' . "\r\n";
-    $headers .= 'From: Arcane Strategies rumble@arcanestrategies.com' . "\r\n";
+    $headers .= 'From: Arcane Strategies rumble@doyourumble.com' . "\r\n";
     $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
 
-    // $headers = 'From: rumble@arcanestrategies.com' . "\r\n" .
-    // 'Reply-To: rumble@arcanestrategies.com' . "\r\n" .
+    // $headers = 'From: rumble@doyourumble.com' . "\r\n" .
+    // 'Reply-To: rumble@doyourumble.com' . "\r\n" .
     // 'X-Mailer: PHP/' . phpversion();
     return $this->report(mail($this->to,$subject,$body,$headers));
   }
@@ -111,7 +111,7 @@ class Mailer
         ]
       ],
       "from"=> [
-        "email"=> "rumble@arcanestrategies.com",
+        "email"=> "rumble@doyourumble.com",
         "name"=> "Arcane Strategies | Rumble"
       ],
       "subject"=> 'URGENT - '.$this->class.' ON '.$this->datetime.' REOPENED',

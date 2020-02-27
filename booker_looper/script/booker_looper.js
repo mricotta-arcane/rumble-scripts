@@ -328,7 +328,7 @@ casper.then(function(){
 										  fs.write(file, currentTime+' | '+classDate +' | '+classText+' | Class '+currentClassID+' from '+room+' can be Reopened  \n', 'a');
 										}
 										logify = true;
-										alertUrl = 'http://rumble-script.arcanestrategies.com/booker_looper/alert.php?class='+classText+'&datetime='+currentTime+'&key='+mailerkey;
+										alertUrl = 'http://rumble-script.doyourumble.com/booker_looper/alert.php?class='+classText+'&datetime='+currentTime+'&key='+mailerkey;
 										this.thenOpen(alertUrl,function(){
 										  this.waitForSelector('.report',function(){
 											fs.write(file, this.fetchText('.report')+' \n', 'a');

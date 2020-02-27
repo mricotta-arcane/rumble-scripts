@@ -245,8 +245,7 @@ casper.then(function(){
             }
             this.echo('Logging');
             logify = true;
-            // alertUrl = 'http://rumble-boxing.local/booker_looper/alert.php?class='+classText+'&datetime='+currentTime+'&key='+mailerkey;
-            alertUrl = 'http://rumble.arcanestrategies.com/booker_looper/alert.php?class='+classText+'&datetime='+currentTime+'&key='+mailerkey;
+            alertUrl = 'http://rumble-script.doyourumble.com/booker_looper/alert.php?class='+classText+'&datetime='+currentTime+'&key='+mailerkey;
             this.thenOpen(alertUrl,function(){
               this.waitForSelector('.report',function(){
                 fs.write(path+'/'+file, this.fetchText('.report')+' \n', 'a');

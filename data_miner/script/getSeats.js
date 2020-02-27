@@ -285,7 +285,7 @@ casper.then(function(){
 
   console.log(classLocationSeatsString);
   // this.open('http://sor.local/rumble-scripts/public/data_miner/addraw.php',{
-  this.open('http://rumble:RuM313d@7a@rumble-script.arcanestrategies.com/data_miner/addraw.php',{
+  this.open('http://rumble:RuM313d@7a@rumble-script.doyourumble.com/data_miner/addraw.php',{
     method: 'post',
     data: {
       'name':'seats',
